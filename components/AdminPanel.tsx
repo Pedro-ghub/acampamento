@@ -113,7 +113,6 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
       return newSet
     })
   }
-  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     loadRegistrations()
