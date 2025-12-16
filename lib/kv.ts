@@ -122,9 +122,30 @@ export function validateAdminKey(key: string | null): boolean {
     return false
   }
   if (!key) {
+    console.log('🔐 Chave não fornecida na URL')
     return false
   }
+  
+  const keyTrimmed = key.trim()
+  const adminKeyTrimmed = adminKey.trim()
+  
+  console.log('🔐 Validando chave admin:', {
+    keyRecebida: keyTrimmed.substring(0, 10) + '...',
+    keyEsperada: adminKeyTrimmed.substring(0, 10) + '...',
+    comprimentoRecebida: keyTrimmed.length,
+    comprimentoEsperada: adminKeyTrimmed.length,
+    saoIguais: keyTrimmed === adminKeyTrimmed
+  })
+  
+  const isValid = keyTrimmed === adminKeyTrimmed
+  
+  if (!isValid) {
+    console.error('❌ Chave inválida!')
+  } else {
+    console.log('✅ Chave válida!')
+  }
+  
   // Comparação case-sensitive
-  return key.trim() === adminKey.trim()
+  return isValid
 }
 
