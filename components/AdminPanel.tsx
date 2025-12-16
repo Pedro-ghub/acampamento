@@ -104,6 +104,68 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
   const [fullDataCache, setFullDataCache] = useState<Record<string, any>>({})
   const [loadingFullData, setLoadingFullData] = useState<Set<string>>(new Set())
 
+  // Hooks no topo
+  useEffect(() => {
+    const loadRegistrations = async () => {
+      try {
+        console.log('📥 Carregando inscrições...')
+        const response = await fetch(`/api/admin/registrations?k=${adminKey}`)
+        console.log('📥 Response status:', response.status)
+        
+        if (response.ok) {
+          const data = await response.json()
+          console.log('📥 Dados recebidos:', {
+            total: data.registrations?.length || 0,
+            registrations: data.registrations
+          })
+          setRegistrations(data.registrations || [])
+        } else {
+          const errorData = await response.json().catch(() => ({}))
+          console.error('❌ Erro na resposta:', response.status, errorData)
+        }
+      } catch (error: any) {
+        console.error('❌ Erro ao carregar inscrições:', {
+          message: error?.message,
+          stack: error?.stack
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadRegistrations()
+  }, [adminKey])
+
+  useEffect(() => {
+    const filterRegistrations = () => {
+      let filtered = [...registrations]
+
+      // Busca por nome ou telefone
+      if (searchTerm) {
+        const term = searchTerm.toLowerCase()
+        filtered = filtered.filter(
+          reg =>
+            reg.name.toLowerCase().includes(term) ||
+            reg.phone.includes(term)
+        )
+      }
+
+      // Filtro de pagamento
+      if (paymentFilter !== 'all') {
+        filtered = filtered.filter(reg => reg.paymentStatus === paymentFilter)
+      }
+
+      // Filtro de camiseta
+      if (shirtFilter === 'with') {
+        filtered = filtered.filter(reg => reg.wantsShirt === 'true')
+      } else if (shirtFilter === 'without') {
+        filtered = filtered.filter(reg => reg.wantsShirt !== 'true')
+      }
+
+      setFilteredRegistrations(filtered)
+    }
+    filterRegistrations()
+  }, [registrations, searchTerm, paymentFilter, shirtFilter])
+
   // Funções
   const loadRegistrations = async () => {
     try {
@@ -270,17 +332,6 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
   const exportCSV = () => {
     window.open(`/api/admin/export.csv?k=${adminKey}`, '_blank')
   }
-
-  // Hooks
-  useEffect(() => {
-    loadRegistrations()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  useEffect(() => {
-    filterRegistrations()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [registrations, searchTerm, paymentFilter, shirtFilter])
 
   if (loading) {
     return (
