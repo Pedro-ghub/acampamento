@@ -51,6 +51,13 @@ export async function getRegistration(id: string): Promise<Registration | null> 
       return null
     }
 
+    // Se receiptUrl começar com "kv://", buscar o comprovante do KV
+    let receiptUrl = data.receiptUrl ? String(data.receiptUrl) : undefined
+    if (receiptUrl && receiptUrl.startsWith('kv://receipt/')) {
+      // O comprovante está no KV, usar a API route para buscar
+      receiptUrl = `/api/receipt/${id}`
+    }
+
     return {
       id,
       name: String(data.name || ''),
@@ -61,7 +68,7 @@ export async function getRegistration(id: string): Promise<Registration | null> 
       wantsShirt: String(data.wantsShirt || 'false'),
       shirtSize: data.shirtSize ? String(data.shirtSize) : undefined,
       paymentStatus: (data.paymentStatus as 'pending' | 'approved' | 'rejected') || 'pending',
-      receiptUrl: data.receiptUrl ? String(data.receiptUrl) : undefined,
+      receiptUrl,
       createdAt: String(data.createdAt || ''),
     }
   } catch (error) {
