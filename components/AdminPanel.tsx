@@ -131,14 +131,6 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
     }
   }
 
-  useEffect(() => {
-    loadRegistrations()
-  }, [])
-
-  useEffect(() => {
-    filterRegistrations()
-  }, [registrations, searchTerm, paymentFilter, shirtFilter])
-
   const filterRegistrations = () => {
     let filtered = [...registrations]
 
