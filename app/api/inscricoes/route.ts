@@ -217,19 +217,28 @@ export async function GET(request: NextRequest) {
           
           console.log('🔍 Buscando dados completos no KV:', fullDataKey)
           
-          // Buscar dados completos no KV primeiro
-          const fullData = await kv.get<string>(fullDataKey)
-          if (fullData) {
-            console.log('✅ Dados completos encontrados no KV')
-            const inscricao = JSON.parse(fullData)
-            console.log('📦 Dados retornados:', {
-              id: inscricao.id,
-              nomeAcampante: inscricao.nomeAcampante,
-              valorTotal: inscricao.valorTotal,
-              dataInscricao: inscricao.dataInscricao
-            })
-            return NextResponse.json({ inscricao }, { status: 200 })
+        // Buscar dados completos no KV primeiro
+        const fullData = await kv.get(fullDataKey)
+        if (fullData) {
+          console.log('✅ Dados completos encontrados no KV')
+          
+          // O KV pode retornar como string JSON ou já como objeto
+          let inscricao: InscricaoData
+          if (typeof fullData === 'string') {
+            inscricao = JSON.parse(fullData)
+          } else {
+            // Já é um objeto
+            inscricao = fullData as InscricaoData
           }
+          
+          console.log('📦 Dados retornados:', {
+            id: inscricao.id,
+            nomeAcampante: inscricao.nomeAcampante,
+            valorTotal: inscricao.valorTotal,
+            dataInscricao: inscricao.dataInscricao
+          })
+          return NextResponse.json({ inscricao }, { status: 200 })
+        }
           
           console.log('⚠️ Dados completos não encontrados, buscando dados resumidos...')
           
