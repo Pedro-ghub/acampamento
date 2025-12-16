@@ -22,21 +22,41 @@ const REG_PREFIX = 'camp:reg:'
  */
 export async function getAllRegistrationIds(): Promise<string[]> {
   try {
+    console.log('🔍 getAllRegistrationIds - Buscando no índice:', REGS_INDEX_KEY)
+    
     // Tentar como LIST primeiro
-    const listResult = await kv.lrange(REGS_INDEX_KEY, 0, -1)
-    if (Array.isArray(listResult) && listResult.length > 0) {
-      return listResult.map(String)
+    try {
+      const listResult = await kv.lrange(REGS_INDEX_KEY, 0, -1)
+      console.log('🔍 getAllRegistrationIds - Resultado LIST:', listResult)
+      if (Array.isArray(listResult) && listResult.length > 0) {
+        const ids = listResult.map(String)
+        console.log(`✅ getAllRegistrationIds - Encontrados ${ids.length} IDs via LIST`)
+        return ids
+      }
+    } catch (listError: any) {
+      console.log('⚠️ getAllRegistrationIds - LIST não funcionou:', listError?.message)
     }
 
     // Tentar como ZSET (sorted set)
-    const zsetResult = await kv.zrange(REGS_INDEX_KEY, 0, -1)
-    if (Array.isArray(zsetResult) && zsetResult.length > 0) {
-      return zsetResult.map(String)
+    try {
+      const zsetResult = await kv.zrange(REGS_INDEX_KEY, 0, -1)
+      console.log('🔍 getAllRegistrationIds - Resultado ZSET:', zsetResult)
+      if (Array.isArray(zsetResult) && zsetResult.length > 0) {
+        const ids = zsetResult.map(String)
+        console.log(`✅ getAllRegistrationIds - Encontrados ${ids.length} IDs via ZSET`)
+        return ids
+      }
+    } catch (zsetError: any) {
+      console.log('⚠️ getAllRegistrationIds - ZSET não funcionou:', zsetError?.message)
     }
 
+    console.log('⚠️ getAllRegistrationIds - Nenhum ID encontrado no índice')
     return []
-  } catch (error) {
-    console.error('Erro ao obter IDs:', error)
+  } catch (error: any) {
+    console.error('❌ Erro ao obter IDs:', {
+      message: error?.message,
+      stack: error?.stack
+    })
     return []
   }
 }
