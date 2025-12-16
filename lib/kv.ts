@@ -81,19 +81,27 @@ export async function getRegistration(id: string): Promise<Registration | null> 
  * Obtém todas as inscrições
  */
 export async function getAllRegistrations(): Promise<Registration[]> {
+  console.log('🔍 getAllRegistrations - Buscando IDs...')
   const ids = await getAllRegistrationIds()
+  console.log(`🔍 getAllRegistrations - Encontrados ${ids.length} IDs:`, ids)
+  
   const registrations = await Promise.all(
     ids.map(id => getRegistration(id))
   )
   
+  console.log(`🔍 getAllRegistrations - Processadas ${registrations.length} inscrições`)
+  
   // Filtrar nulos e ordenar por data (mais recentes primeiro)
-  return registrations
+  const filtered = registrations
     .filter((reg): reg is Registration => reg !== null)
     .sort((a, b) => {
       const dateA = new Date(a.createdAt).getTime()
       const dateB = new Date(b.createdAt).getTime()
       return dateB - dateA
     })
+  
+  console.log(`✅ getAllRegistrations - Retornando ${filtered.length} inscrições válidas`)
+  return filtered
 }
 
 /**
