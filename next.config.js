@@ -14,12 +14,6 @@ const nextConfig = {
       },
     ],
   },
-  // Configuração para uploads
-  api: {
-    bodyParser: {
-      sizeLimit: '5mb',
-    },
-  },
 }
 
 module.exports = nextConfig
