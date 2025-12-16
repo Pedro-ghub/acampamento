@@ -62,6 +62,12 @@ export async function POST(request: NextRequest) {
     // Salvar no KV (fonte principal na Vercel)
     let kvSaved = false
     try {
+      // Verificar se as variáveis de ambiente do KV estão configuradas
+      if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
+        console.warn('Variáveis do KV não configuradas. Tentando salvar apenas no JSON.')
+        throw new Error('KV não configurado')
+      }
+      
       const { kv } = await import('@vercel/kv')
       const REGS_INDEX_KEY = 'camp:regs'
       const REG_PREFIX = 'camp:reg:'
@@ -91,8 +97,8 @@ export async function POST(request: NextRequest) {
     } catch (kvError: any) {
       console.error('Erro ao salvar no KV:', {
         message: kvError?.message,
-        stack: kvError?.stack,
-        error: kvError
+        name: kvError?.name,
+        error: String(kvError)
       })
       // Se falhar o KV, tenta salvar no JSON como fallback
     }
