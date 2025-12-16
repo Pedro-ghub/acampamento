@@ -20,9 +20,14 @@ export default async function AdminPage(props: PageProps) {
   const key = searchParams.k || null
 
   console.log('🔍 AdminPage - Chave recebida:', key ? `${key.substring(0, 10)}...` : 'null')
+  console.log('🔍 AdminPage - ADMIN_KEY configurada:', !!process.env.ADMIN_KEY)
+  console.log('🔍 AdminPage - ADMIN_KEY valor:', process.env.ADMIN_KEY ? `${process.env.ADMIN_KEY.substring(0, 10)}...` : 'não configurada')
 
   // Validar chave - se não for válida, retornar 404
-  if (!validateAdminKey(key)) {
+  const isValid = validateAdminKey(key)
+  console.log('🔍 AdminPage - Validação resultou em:', isValid)
+  
+  if (!isValid) {
     console.error('❌ AdminPage - Chave inválida, retornando 404')
     notFound()
   }
