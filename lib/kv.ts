@@ -111,9 +111,13 @@ export async function updatePaymentStatus(
 export function validateAdminKey(key: string | null): boolean {
   const adminKey = process.env.ADMIN_KEY
   if (!adminKey) {
-    console.error('ADMIN_KEY não configurada no .env')
+    console.error('ADMIN_KEY não configurada nas variáveis de ambiente')
     return false
   }
-  return key === adminKey
+  if (!key) {
+    return false
+  }
+  // Comparação case-sensitive
+  return key.trim() === adminKey.trim()
 }
 

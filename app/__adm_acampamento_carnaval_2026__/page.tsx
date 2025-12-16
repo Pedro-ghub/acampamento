@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import AdminPanel from '@/components/AdminPanel'
 import { validateAdminKey } from '@/lib/kv'
 
@@ -19,7 +19,7 @@ export default function AdminPage({ searchParams }: PageProps) {
 
   // Validar chave - se não for válida, retornar 404
   if (!validateAdminKey(key)) {
-    redirect('/404')
+    notFound()
   }
 
   return <AdminPanel adminKey={key!} />
