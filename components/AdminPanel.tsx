@@ -104,54 +104,6 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
   const [fullDataCache, setFullDataCache] = useState<Record<string, any>>({})
   const [loadingFullData, setLoadingFullData] = useState<Set<string>>(new Set())
 
-  const toggleCard = async (id: string) => {
-    setExpandedCards(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(id)) {
-        newSet.delete(id)
-      } else {
-        newSet.add(id)
-        // Buscar dados completos se ainda não foram carregados
-        if (!fullDataCache[id] && !loadingFullData.has(id)) {
-          loadFullData(id)
-        }
-      }
-      return newSet
-    })
-  }
-
-  const loadFullData = async (id: string) => {
-    if (loadingFullData.has(id) || fullDataCache[id]) return
-    
-    setLoadingFullData(prev => new Set(prev).add(id))
-    try {
-      const response = await fetch(`/api/admin/registrations/${id}/full?k=${adminKey}`)
-      if (response.ok) {
-        const data = await response.json()
-        setFullDataCache(prev => ({
-          ...prev,
-          [id]: data.inscricao
-        }))
-      }
-    } catch (error) {
-      console.error('Erro ao carregar dados completos:', error)
-    } finally {
-      setLoadingFullData(prev => {
-        const newSet = new Set(prev)
-        newSet.delete(id)
-        return newSet
-      })
-    }
-  }
-
-  useEffect(() => {
-    loadRegistrations()
-  }, [])
-
-  useEffect(() => {
-    filterRegistrations()
-  }, [registrations, searchTerm, paymentFilter, shirtFilter])
-
   const loadRegistrations = async () => {
     try {
       console.log('📥 Carregando inscrições...')
@@ -178,6 +130,14 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    loadRegistrations()
+  }, [])
+
+  useEffect(() => {
+    filterRegistrations()
+  }, [registrations, searchTerm, paymentFilter, shirtFilter])
 
   const filterRegistrations = () => {
     let filtered = [...registrations]
