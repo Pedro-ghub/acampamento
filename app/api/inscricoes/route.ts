@@ -93,7 +93,18 @@ export async function POST(request: NextRequest) {
       
       // Salvar dados completos no KV (para recuperação na página de pagamento)
       const fullDataKey = `camp:full:${inscricaoCompleta.id}`
-      await kv.set(fullDataKey, JSON.stringify(inscricaoCompleta), { ex: 60 * 60 * 24 * 365 }) // Expira em 1 ano
+      const fullDataString = JSON.stringify(inscricaoCompleta)
+      console.log('💾 Salvando dados completos no KV:', {
+        key: fullDataKey,
+        id: inscricaoCompleta.id,
+        tamanho: fullDataString.length,
+        valorTotal: inscricaoCompleta.valorTotal,
+        nomeAcampante: inscricaoCompleta.nomeAcampante,
+        temGenero: !!inscricaoCompleta.generoAcampante,
+        temDataNasc: !!inscricaoCompleta.dataNascimentoAcampante
+      })
+      await kv.set(fullDataKey, fullDataString, { ex: 60 * 60 * 24 * 365 }) // Expira em 1 ano
+      console.log('✅ Dados completos salvos no KV com sucesso')
       
       // Adicionar ao índice (ZSET com timestamp)
       const timestamp = new Date(inscricaoCompleta.dataInscricao).getTime()
