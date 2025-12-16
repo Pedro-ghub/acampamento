@@ -188,17 +188,29 @@ export async function GET(request: NextRequest) {
         const { kv } = await import('@vercel/kv')
         const fullDataKey = `camp:full:${id}`
         
+        console.log('🔍 Buscando dados completos no KV:', fullDataKey)
+        
         // Buscar dados completos no KV primeiro
         const fullData = await kv.get<string>(fullDataKey)
         if (fullData) {
+          console.log('✅ Dados completos encontrados no KV')
           const inscricao = JSON.parse(fullData)
+          console.log('📦 Dados retornados:', {
+            id: inscricao.id,
+            nomeAcampante: inscricao.nomeAcampante,
+            valorTotal: inscricao.valorTotal,
+            dataInscricao: inscricao.dataInscricao
+          })
           return NextResponse.json({ inscricao }, { status: 200 })
         }
+        
+        console.log('⚠️ Dados completos não encontrados, buscando dados resumidos...')
         
         // Se não encontrou dados completos, tenta buscar dados resumidos
         const { getRegistration } = await import('@/lib/kv')
         const registration = await getRegistration(id)
         if (registration) {
+          console.log('⚠️ Retornando apenas dados resumidos (incompletos)')
           // Retornar dados básicos (melhor que nada)
           return NextResponse.json({ 
             inscricao: {
@@ -215,8 +227,13 @@ export async function GET(request: NextRequest) {
             }
           }, { status: 200 })
         }
+        
+        console.log('❌ Nenhum dado encontrado no KV')
       } catch (kvError: any) {
-        console.error('Erro ao buscar no KV:', kvError?.message)
+        console.error('❌ Erro ao buscar no KV:', {
+          message: kvError?.message,
+          stack: kvError?.stack
+        })
         // Continua para tentar buscar no JSON
       }
     } else if (!id && process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
