@@ -270,6 +270,14 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
     window.open(`/api/admin/export.csv?k=${adminKey}`, '_blank')
   }
 
+  useEffect(() => {
+    loadRegistrations()
+  }, [])
+
+  useEffect(() => {
+    filterRegistrations()
+  }, [registrations, searchTerm, paymentFilter, shirtFilter])
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
