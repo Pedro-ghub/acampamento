@@ -15,7 +15,7 @@ interface PageProps {
 }
 
 export default function AdminPage({ searchParams }: PageProps) {
-  const key = searchParams.k
+  const key = searchParams.k || null
 
   // Validar chave - se não for válida, retornar 404
   if (!validateAdminKey(key)) {
