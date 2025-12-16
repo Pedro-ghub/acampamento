@@ -104,7 +104,15 @@ export async function POST(request: NextRequest) {
         temDataNasc: !!inscricaoCompleta.dataNascimentoAcampante
       })
       await kv.set(fullDataKey, fullDataString, { ex: 60 * 60 * 24 * 365 }) // Expira em 1 ano
-      console.log('✅ Dados completos salvos no KV com sucesso')
+      
+      // Verificar se foi salvo corretamente
+      const verificar = await kv.get<string>(fullDataKey)
+      if (verificar) {
+        console.log('✅ Dados completos salvos e verificados no KV com sucesso')
+      } else {
+        console.error('❌ ERRO: Dados não foram salvos no KV após tentativa!')
+        throw new Error('Falha ao salvar dados completos no KV')
+      }
       
       // Adicionar ao índice (ZSET com timestamp)
       const timestamp = new Date(inscricaoCompleta.dataInscricao).getTime()
