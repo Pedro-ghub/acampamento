@@ -273,12 +273,10 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
   // Hooks após todas as funções
   useEffect(() => {
     loadRegistrations()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     filterRegistrations()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [registrations, searchTerm, paymentFilter, shirtFilter])
 
   if (loading) {
