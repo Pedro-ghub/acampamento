@@ -356,12 +356,12 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
               >
                 {/* Header do Card - Sempre Visível */}
                 <div className="p-4 border-b border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3">
                         <button
                           onClick={() => toggleCard(reg.id)}
-                          className="text-gray-400 hover:text-gray-600 transition-colors"
+                          className="text-gray-400 hover:text-gray-600 transition-colors shrink-0"
                           title={isExpanded ? 'Minimizar' : 'Expandir'}
                         >
                           {isExpanded ? (
@@ -374,21 +374,23 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
                             </svg>
                           )}
                         </button>
-                        <div>
-                          <h3 className="text-xl font-bold text-gray-900 mb-1">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-xl font-bold text-gray-900 mb-1 truncate">
                             {reg.name}
                           </h3>
-                          <div className="flex items-center gap-4 text-sm text-gray-600">
-                            <span>ID: {reg.id}</span>
-                            <span>{formatDate(reg.createdAt)}</span>
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-600">
+                            <span className="whitespace-nowrap">ID: {reg.id}</span>
+                            <span className="whitespace-nowrap">{formatDate(reg.createdAt)}</span>
                             {reg.phone && (
-                              <span className="text-blue-600">{reg.phone}</span>
+                              <span className="text-blue-600 truncate">{reg.phone}</span>
                             )}
                           </div>
                         </div>
                       </div>
                     </div>
-                    {getStatusBadge(reg.paymentStatus)}
+                    <div className="shrink-0">
+                      {getStatusBadge(reg.paymentStatus)}
+                    </div>
                   </div>
                 </div>
 
