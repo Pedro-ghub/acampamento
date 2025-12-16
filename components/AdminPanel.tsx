@@ -100,6 +100,20 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
   const [shirtFilter, setShirtFilter] = useState<'all' | 'with' | 'without'>('all')
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [updating, setUpdating] = useState<string | null>(null)
+  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set())
+
+  const toggleCard = (id: string) => {
+    setExpandedCards(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(id)) {
+        newSet.delete(id)
+      } else {
+        newSet.add(id)
+      }
+      return newSet
+    })
+  }
+  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     loadRegistrations()
@@ -333,82 +347,114 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
               <p className="text-gray-500 text-lg">Nenhuma inscrição encontrada.</p>
             </div>
           ) : (
-            filteredRegistrations.map((reg) => (
+            filteredRegistrations.map((reg) => {
+              const isExpanded = expandedCards.has(reg.id)
+              
+              return (
               <div
                 key={reg.id}
-                className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+                className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
               >
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Informações Principais */}
-                  <div className="lg:col-span-2">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-1">
-                          {reg.name}
-                        </h3>
-                        <div className="flex items-center gap-4 text-sm text-gray-600">
-                          <span>ID: {reg.id}</span>
-                          <span>{formatDate(reg.createdAt)}</span>
-                        </div>
-                      </div>
-                      {getStatusBadge(reg.paymentStatus)}
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <span className="text-sm font-medium text-gray-700">Telefone:</span>
-                        <div className="flex items-center gap-2 mt-1">
-                          <a
-                            href={`https://wa.me/55${reg.phone.replace(/\D/g, '')}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline"
-                          >
-                            {reg.phone}
-                          </a>
-                          <button
-                            onClick={() => copyPhone(reg.phone)}
-                            className="text-gray-400 hover:text-gray-600"
-                            title="Copiar telefone"
-                          >
-                            📋
-                          </button>
-                        </div>
-                      </div>
-
-                      {reg.age && (
+                {/* Header do Card - Sempre Visível */}
+                <div className="p-4 border-b border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => toggleCard(reg.id)}
+                          className="text-gray-400 hover:text-gray-600 transition-colors"
+                          title={isExpanded ? 'Minimizar' : 'Expandir'}
+                        >
+                          {isExpanded ? (
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                            </svg>
+                          ) : (
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          )}
+                        </button>
                         <div>
-                          <span className="text-sm font-medium text-gray-700">Idade:</span>
-                          <p className="text-gray-900">{reg.age} anos</p>
+                          <h3 className="text-xl font-bold text-gray-900 mb-1">
+                            {reg.name}
+                          </h3>
+                          <div className="flex items-center gap-4 text-sm text-gray-600">
+                            <span>ID: {reg.id}</span>
+                            <span>{formatDate(reg.createdAt)}</span>
+                            {reg.phone && (
+                              <span className="text-blue-600">{reg.phone}</span>
+                            )}
+                          </div>
                         </div>
-                      )}
-
-                      {reg.city && (
-                        <div>
-                          <span className="text-sm font-medium text-gray-700">Cidade:</span>
-                          <p className="text-gray-900">{reg.city}</p>
-                        </div>
-                      )}
-
-                      {reg.church && (
-                        <div>
-                          <span className="text-sm font-medium text-gray-700">Igreja:</span>
-                          <p className="text-gray-900">{reg.church}</p>
-                        </div>
-                      )}
-
-                      <div>
-                        <span className="text-sm font-medium text-gray-700">Camiseta:</span>
-                        <p className="text-gray-900">
-                          {reg.wantsShirt === 'true' ? 'Sim' : 'Não'}
-                          {reg.wantsShirt === 'true' && reg.shirtSize && ` (${reg.shirtSize})`}
-                        </p>
                       </div>
                     </div>
+                    {getStatusBadge(reg.paymentStatus)}
                   </div>
+                </div>
 
-                  {/* Comprovante e Ações */}
-                  <div className="border-t lg:border-t-0 lg:border-l pt-4 lg:pt-0 lg:pl-6">
+                {/* Conteúdo Expandido */}
+                {isExpanded && (
+                  <div className="p-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      {/* Informações Principais */}
+                      <div className="lg:col-span-2">
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div>
+                            <span className="text-sm font-medium text-gray-700">Telefone:</span>
+                            <div className="flex items-center gap-2 mt-1">
+                              <a
+                                href={`https://wa.me/55${reg.phone.replace(/\D/g, '')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:underline"
+                              >
+                                {reg.phone}
+                              </a>
+                              <button
+                                onClick={() => copyPhone(reg.phone)}
+                                className="text-gray-400 hover:text-gray-600"
+                                title="Copiar telefone"
+                              >
+                                📋
+                              </button>
+                            </div>
+                          </div>
+
+                          {reg.age && (
+                            <div>
+                              <span className="text-sm font-medium text-gray-700">Idade:</span>
+                              <p className="text-gray-900">{reg.age} anos</p>
+                            </div>
+                          )}
+
+                          {reg.city && (
+                            <div>
+                              <span className="text-sm font-medium text-gray-700">Cidade:</span>
+                              <p className="text-gray-900">{reg.city}</p>
+                            </div>
+                          )}
+
+                          {reg.church && (
+                            <div>
+                              <span className="text-sm font-medium text-gray-700">Igreja:</span>
+                              <p className="text-gray-900">{reg.church}</p>
+                            </div>
+                          )}
+
+                          <div>
+                            <span className="text-sm font-medium text-gray-700">Camiseta:</span>
+                            <p className="text-gray-900">
+                              {reg.wantsShirt === 'true' ? 'Sim' : 'Não'}
+                              {reg.wantsShirt === 'true' && reg.shirtSize && ` (${reg.shirtSize})`}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Comprovante e Ações */}
+                      <div className="border-t lg:border-t-0 lg:border-l pt-4 lg:pt-0 lg:pl-6">
                     {/* Comprovante */}
                     <div className="mb-4">
                       <span className="text-sm font-medium text-gray-700 block mb-2">
@@ -489,11 +535,13 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
                           {updating === reg.id ? 'Atualizando...' : '↩ Pendente'}
                         </button>
                       </div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
-            ))
+            )
+            })
           )}
         </div>
       </div>
