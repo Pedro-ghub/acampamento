@@ -49,11 +49,13 @@ interface InscricaoData {
 }
 
 export async function POST(request: NextRequest) {
+  let inscricaoCompleta: InscricaoData | null = null
+  
   try {
     const data: InscricaoData = await request.json()
     
     // Adicionar metadados
-    const inscricaoCompleta: InscricaoData = {
+    inscricaoCompleta = {
       ...data,
       dataInscricao: new Date().toISOString(),
       id: `INS-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -93,9 +95,9 @@ export async function POST(request: NextRequest) {
       await kv.zadd(REGS_INDEX_KEY, { score: timestamp, member: inscricaoCompleta.id })
       
       kvSaved = true
-      console.log('Inscrição salva no KV com sucesso:', inscricaoCompleta.id)
+      console.log('✅ Inscrição salva no KV:', inscricaoCompleta.id)
     } catch (kvError: any) {
-      console.error('Erro ao salvar no KV:', {
+      console.error('❌ Erro ao salvar no KV:', {
         message: kvError?.message,
         name: kvError?.name,
         error: String(kvError)
@@ -104,6 +106,9 @@ export async function POST(request: NextRequest) {
     }
     
     // Tentar salvar no JSON (fallback ou backup local)
+    // Na Vercel, o filesystem é read-only, então isso sempre falhará
+    // Mas não é um problema se o KV já salvou
+    let jsonSaved = false
     try {
       const dataDir = path.join(process.cwd(), 'data')
       if (!existsSync(dataDir)) {
@@ -120,23 +125,27 @@ export async function POST(request: NextRequest) {
       
       inscricoes.push(inscricaoCompleta)
       await writeFile(filePath, JSON.stringify(inscricoes, null, 2), 'utf-8')
-      console.log('Inscrição salva no JSON (backup):', inscricaoCompleta.id)
+      jsonSaved = true
+      console.log('✅ Inscrição salva no JSON:', inscricaoCompleta.id)
     } catch (jsonError: any) {
-      // Se nem JSON nem KV funcionaram, retorna erro
-      if (!kvSaved) {
-        console.error('Erro ao salvar em ambos KV e JSON:', jsonError?.message)
-        return NextResponse.json(
-          { 
-            success: false, 
-            message: 'Erro ao salvar inscrição. Por favor, tente novamente.' 
-          },
-          { status: 500 }
-        )
-      }
-      // Se KV salvou mas JSON falhou, apenas loga (normal na Vercel)
-      console.log('KV salvou, mas JSON falhou (normal na Vercel):', jsonError?.message)
+      // Na Vercel, isso sempre falha (read-only filesystem)
+      // Mas não é problema se o KV salvou
+      console.log('⚠️ JSON falhou (normal na Vercel):', jsonError?.message)
     }
     
+    // Se nenhum dos dois salvou, retorna erro
+    if (!kvSaved && !jsonSaved) {
+      console.error('❌ Falha ao salvar em ambos KV e JSON')
+      return NextResponse.json(
+        { 
+          success: false, 
+          message: 'Erro ao salvar inscrição. Por favor, verifique a configuração do servidor e tente novamente.' 
+        },
+        { status: 500 }
+      )
+    }
+    
+    // Se pelo menos um salvou, retorna sucesso
     return NextResponse.json(
       { 
         success: true, 
@@ -146,15 +155,17 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     )
   } catch (error: any) {
-    console.error('Erro geral ao salvar inscrição:', {
+    console.error('❌ Erro geral ao salvar inscrição:', {
       message: error?.message,
       stack: error?.stack,
-      error
+      error: String(error)
     })
+    
     return NextResponse.json(
       { 
         success: false, 
-        message: error?.message || 'Erro ao salvar inscrição. Por favor, tente novamente.' 
+        message: error?.message || 'Erro ao processar inscrição. Por favor, tente novamente.',
+        id: inscricaoCompleta?.id || null
       },
       { status: 500 }
     )
