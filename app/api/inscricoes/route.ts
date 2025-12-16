@@ -183,60 +183,52 @@ export async function GET(request: NextRequest) {
     const id = searchParams.get('id')
     
     // Tentar buscar no KV primeiro (fonte principal na Vercel)
-    try {
-      if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+    if (id && process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+      try {
         const { kv } = await import('@vercel/kv')
-        const { getRegistration, getAllRegistrations } = await import('@/lib/kv')
+        const fullDataKey = `camp:full:${id}`
         
-        if (id) {
-          // Buscar inscrição específica no KV
-          const registration = await getRegistration(id)
-          if (registration) {
-            // Converter formato KV para formato completo da inscrição
-            // Precisamos buscar os dados completos do JSON ou reconstruir
-            // Por enquanto, vamos tentar buscar no JSON também para dados completos
-            try {
-              const filePath = path.join(process.cwd(), 'data', 'inscricoes.json')
-              if (existsSync(filePath)) {
-                const fileContent = await readFile(filePath, 'utf-8')
-                const inscricoes = JSON.parse(fileContent)
-                const inscricaoCompleta = inscricoes.find((ins: any) => ins.id === id)
-                if (inscricaoCompleta) {
-                  return NextResponse.json({ inscricao: inscricaoCompleta }, { status: 200 })
-                }
-              }
-            } catch (jsonError) {
-              // Se não encontrar no JSON, retorna dados básicos do KV
-              console.log('Não encontrado no JSON, usando dados do KV')
-            }
-            
-            // Se não encontrou no JSON, retorna dados do KV (formato básico)
-            // Isso pode não ter todos os campos, mas pelo menos funciona
-            return NextResponse.json({ 
-              inscricao: {
-                id: registration.id,
-                nomeAcampante: registration.name,
-                celularResponsavelLegal: registration.phone,
-                idadeAcampante: registration.age,
-                cidadeResponsavel: registration.city,
-                queroCamisa: registration.wantsShirt === 'true',
-                tamanhoCamisa: registration.shirtSize,
-                valorInscricao: 0, // Não temos no KV, será calculado na página
-                valorCamisa: registration.wantsShirt === 'true' ? 250 : 0,
-                valorTotal: 0,
-                paymentStatus: registration.paymentStatus,
-              }
-            }, { status: 200 })
-          }
-        } else {
-          // Buscar todas as inscrições no KV
-          const registrations = await getAllRegistrations()
-          return NextResponse.json({ inscricoes: registrations }, { status: 200 })
+        // Buscar dados completos no KV primeiro
+        const fullData = await kv.get<string>(fullDataKey)
+        if (fullData) {
+          const inscricao = JSON.parse(fullData)
+          return NextResponse.json({ inscricao }, { status: 200 })
         }
+        
+        // Se não encontrou dados completos, tenta buscar dados resumidos
+        const { getRegistration } = await import('@/lib/kv')
+        const registration = await getRegistration(id)
+        if (registration) {
+          // Retornar dados básicos (melhor que nada)
+          return NextResponse.json({ 
+            inscricao: {
+              id: registration.id,
+              nomeAcampante: registration.name,
+              celularResponsavelLegal: registration.phone,
+              idadeAcampante: registration.age,
+              cidadeResponsavel: registration.city,
+              queroCamisa: registration.wantsShirt === 'true',
+              tamanhoCamisa: registration.shirtSize,
+              valorInscricao: 0,
+              valorCamisa: registration.wantsShirt === 'true' ? 250 : 0,
+              valorTotal: 0,
+            }
+          }, { status: 200 })
+        }
+      } catch (kvError: any) {
+        console.error('Erro ao buscar no KV:', kvError?.message)
+        // Continua para tentar buscar no JSON
       }
-    } catch (kvError: any) {
-      console.error('Erro ao buscar no KV:', kvError?.message)
-      // Continua para tentar buscar no JSON
+    } else if (!id && process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+      // Buscar todas as inscrições no KV
+      try {
+        const { getAllRegistrations } = await import('@/lib/kv')
+        const registrations = await getAllRegistrations()
+        return NextResponse.json({ inscricoes: registrations }, { status: 200 })
+      } catch (kvError: any) {
+        console.error('Erro ao buscar todas as inscrições no KV:', kvError?.message)
+        // Continua para tentar buscar no JSON
+      }
     }
     
     // Fallback: buscar no JSON (apenas em desenvolvimento local)
