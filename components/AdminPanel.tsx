@@ -166,62 +166,7 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
     filterRegistrations()
   }, [registrations, searchTerm, paymentFilter, shirtFilter])
 
-  // Funções
-  const loadRegistrations = async () => {
-    try {
-      console.log('📥 Carregando inscrições...')
-      const response = await fetch(`/api/admin/registrations?k=${adminKey}`)
-      console.log('📥 Response status:', response.status)
-      
-      if (response.ok) {
-        const data = await response.json()
-        console.log('📥 Dados recebidos:', {
-          total: data.registrations?.length || 0,
-          registrations: data.registrations
-        })
-        setRegistrations(data.registrations || [])
-      } else {
-        const errorData = await response.json().catch(() => ({}))
-        console.error('❌ Erro na resposta:', response.status, errorData)
-      }
-    } catch (error: any) {
-      console.error('❌ Erro ao carregar inscrições:', {
-        message: error?.message,
-        stack: error?.stack
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const filterRegistrations = () => {
-    let filtered = [...registrations]
-
-    // Busca por nome ou telefone
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase()
-      filtered = filtered.filter(
-        reg =>
-          reg.name.toLowerCase().includes(term) ||
-          reg.phone.includes(term)
-      )
-    }
-
-    // Filtro de pagamento
-    if (paymentFilter !== 'all') {
-      filtered = filtered.filter(reg => reg.paymentStatus === paymentFilter)
-    }
-
-    // Filtro de camiseta
-    if (shirtFilter === 'with') {
-      filtered = filtered.filter(reg => reg.wantsShirt === 'true')
-    } else if (shirtFilter === 'without') {
-      filtered = filtered.filter(reg => reg.wantsShirt !== 'true')
-    }
-
-    setFilteredRegistrations(filtered)
-  }
-
+  // Funções auxiliares
   const toggleCard = async (id: string) => {
     setExpandedCards(prev => {
       const newSet = new Set(prev)
