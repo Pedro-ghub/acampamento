@@ -534,6 +534,7 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
                           {updating === reg.id ? 'Atualizando...' : '↩ Pendente'}
                         </button>
                       </div>
+                    </div>
                       </div>
                     </div>
                   </div>
