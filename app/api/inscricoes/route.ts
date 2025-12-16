@@ -59,28 +59,8 @@ export async function POST(request: NextRequest) {
       id: `INS-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     }
     
-    // Criar diretório se não existir
-    const dataDir = path.join(process.cwd(), 'data')
-    if (!existsSync(dataDir)) {
-      await mkdir(dataDir, { recursive: true })
-    }
-    
-    // Ler arquivo existente ou criar novo
-    const filePath = path.join(dataDir, 'inscricoes.json')
-    let inscricoes: InscricaoData[] = []
-    
-    if (existsSync(filePath)) {
-      const fileContent = await readFile(filePath, 'utf-8')
-      inscricoes = JSON.parse(fileContent)
-    }
-    
-    // Adicionar nova inscrição
-    inscricoes.push(inscricaoCompleta)
-    
-    // Salvar arquivo (backup local)
-    await writeFile(filePath, JSON.stringify(inscricoes, null, 2), 'utf-8')
-    
-    // Salvar também no KV (formato para admin)
+    // Salvar no KV (fonte principal na Vercel)
+    // Na Vercel, o sistema de arquivos é read-only, então usamos apenas KV
     try {
       const { kv } = await import('@vercel/kv')
       const REGS_INDEX_KEY = 'camp:regs'
@@ -105,9 +85,33 @@ export async function POST(request: NextRequest) {
       // Adicionar ao índice (ZSET com timestamp)
       const timestamp = new Date(inscricaoCompleta.dataInscricao).getTime()
       await kv.zadd(REGS_INDEX_KEY, { score: timestamp, member: inscricaoCompleta.id })
-    } catch (kvError) {
-      // Se falhar o KV, continua (já salvou no JSON)
-      console.error('Erro ao salvar no KV (continuando com JSON):', kvError)
+    } catch (kvError: any) {
+      // Se falhar o KV, retorna erro
+      console.error('Erro ao salvar no KV:', kvError?.message || kvError)
+      throw new Error('Erro ao salvar inscrição no banco de dados')
+    }
+    
+    // Tentar salvar também no JSON (apenas em desenvolvimento local)
+    // Na Vercel isso falhará silenciosamente, mas não é problema
+    try {
+      const dataDir = path.join(process.cwd(), 'data')
+      if (!existsSync(dataDir)) {
+        await mkdir(dataDir, { recursive: true })
+      }
+      
+      const filePath = path.join(dataDir, 'inscricoes.json')
+      let inscricoes: InscricaoData[] = []
+      
+      if (existsSync(filePath)) {
+        const fileContent = await readFile(filePath, 'utf-8')
+        inscricoes = JSON.parse(fileContent)
+      }
+      
+      inscricoes.push(inscricaoCompleta)
+      await writeFile(filePath, JSON.stringify(inscricoes, null, 2), 'utf-8')
+    } catch (jsonError: any) {
+      // Ignora erro de JSON (normal na Vercel onde o filesystem é read-only)
+      console.log('Não foi possível salvar backup JSON (normal na Vercel):', jsonError?.message)
     }
     
     return NextResponse.json(
