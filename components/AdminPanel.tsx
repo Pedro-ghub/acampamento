@@ -104,6 +104,15 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
   const [fullDataCache, setFullDataCache] = useState<Record<string, any>>({})
   const [loadingFullData, setLoadingFullData] = useState<Set<string>>(new Set())
 
+  // Hooks devem vir logo após os estados
+  useEffect(() => {
+    loadRegistrations()
+  }, [])
+
+  useEffect(() => {
+    filterRegistrations()
+  }, [registrations, searchTerm, paymentFilter, shirtFilter])
+
   const loadRegistrations = async () => {
     try {
       console.log('📥 Carregando inscrições...')
@@ -269,14 +278,6 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
   const exportCSV = () => {
     window.open(`/api/admin/export.csv?k=${adminKey}`, '_blank')
   }
-
-  useEffect(() => {
-    loadRegistrations()
-  }, [])
-
-  useEffect(() => {
-    filterRegistrations()
-  }, [registrations, searchTerm, paymentFilter, shirtFilter])
 
   if (loading) {
     return (
