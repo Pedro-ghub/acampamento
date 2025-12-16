@@ -82,6 +82,7 @@ export async function POST(request: NextRequest) {
     
     // Salvar também no KV (formato para admin)
     try {
+      const { kv } = await import('@vercel/kv')
       const REGS_INDEX_KEY = 'camp:regs'
       const REG_PREFIX = 'camp:reg:'
       

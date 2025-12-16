@@ -75,6 +75,7 @@ export async function POST(request: NextRequest) {
     
     // Atualizar também no KV
     try {
+      const { kv } = await import('@vercel/kv')
       const REG_PREFIX = 'camp:reg:'
       await kv.hset(`${REG_PREFIX}${inscricaoId}`, { receiptUrl })
     } catch (kvError) {
