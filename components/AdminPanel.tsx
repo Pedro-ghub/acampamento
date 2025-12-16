@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 
 // Componente para exibir comprovante do KV
@@ -104,7 +104,8 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
   const [fullDataCache, setFullDataCache] = useState<Record<string, any>>({})
   const [loadingFullData, setLoadingFullData] = useState<Set<string>>(new Set())
 
-  const loadRegistrations = useCallback(async () => {
+  // Funções
+  const loadRegistrations = async () => {
     try {
       console.log('📥 Carregando inscrições...')
       const response = await fetch(`/api/admin/registrations?k=${adminKey}`)
@@ -129,9 +130,9 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
     } finally {
       setLoading(false)
     }
-  }, [adminKey])
+  }
 
-  const filterRegistrations = useCallback(() => {
+  const filterRegistrations = () => {
     let filtered = [...registrations]
 
     // Busca por nome ou telefone
@@ -157,7 +158,7 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
     }
 
     setFilteredRegistrations(filtered)
-  }, [registrations, searchTerm, paymentFilter, shirtFilter])
+  }
 
   const toggleCard = async (id: string) => {
     setExpandedCards(prev => {
@@ -270,14 +271,16 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
     window.open(`/api/admin/export.csv?k=${adminKey}`, '_blank')
   }
 
-  // Hooks após todas as funções
+  // Hooks
   useEffect(() => {
     loadRegistrations()
-  }, [loadRegistrations])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     filterRegistrations()
-  }, [filterRegistrations])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [registrations, searchTerm, paymentFilter, shirtFilter])
 
   if (loading) {
     return (
