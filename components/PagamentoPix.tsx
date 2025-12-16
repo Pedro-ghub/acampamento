@@ -74,12 +74,29 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
     const buscarInscricao = async () => {
       try {
         const response = await fetch(`/api/inscricoes?id=${inscricaoId}`)
+        
+        if (!response.ok) {
+          throw new Error(`Erro ${response.status}: ${response.statusText}`)
+        }
+        
         const data = await response.json()
         
+        console.log('📥 Dados recebidos da API:', data)
+        
         if (data.inscricao) {
+          console.log('✅ Inscrição encontrada:', {
+            id: data.inscricao.id,
+            nomeAcampante: data.inscricao.nomeAcampante,
+            valorTotal: data.inscricao.valorTotal,
+            dataInscricao: data.inscricao.dataInscricao,
+            generoAcampante: data.inscricao.generoAcampante,
+            dataNascimentoAcampante: data.inscricao.dataNascimentoAcampante,
+            nomeResponsavelLegal: data.inscricao.nomeResponsavelLegal
+          })
           setInscricao(data.inscricao)
         } else {
           // Se não encontrar, redirecionar
+          console.error('❌ Inscrição não encontrada nos dados:', data)
           alert('Inscrição não encontrada. Redirecionando...')
           router.push('/formulario')
         }
@@ -103,15 +120,38 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
     setTimeout(() => setCopiado(false), 3000)
   }
 
-  const formatarData = (dataISO: string) => {
-    const data = new Date(dataISO)
-    return data.toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
+  const formatarData = (dataISO: string | undefined) => {
+    if (!dataISO) return 'Data não disponível'
+    try {
+      const data = new Date(dataISO)
+      if (isNaN(data.getTime())) {
+        console.error('Data inválida:', dataISO)
+        return 'Data inválida'
+      }
+      return data.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    } catch (error) {
+      console.error('Erro ao formatar data:', error, dataISO)
+      return 'Data inválida'
+    }
+  }
+  
+  const formatarDataNascimento = (dataISO: string | undefined) => {
+    if (!dataISO) return 'Não informado'
+    try {
+      const data = new Date(dataISO)
+      if (isNaN(data.getTime())) {
+        return 'Data inválida'
+      }
+      return data.toLocaleDateString('pt-BR')
+    } catch (error) {
+      return 'Data inválida'
+    }
   }
 
   if (loading) {
@@ -224,7 +264,7 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
               <div>
                 <p className="text-gray-600 text-sm mb-1">Data de nascimento</p>
                 <p className="text-gray-900 font-semibold">
-                  {new Date(inscricao.dataNascimentoAcampante).toLocaleDateString('pt-BR')}
+                  {formatarDataNascimento(inscricao.dataNascimentoAcampante)}
                 </p>
               </div>
               <div>
