@@ -454,87 +454,87 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
 
                       {/* Comprovante e Ações */}
                       <div className="border-t lg:border-t-0 lg:border-l pt-4 lg:pt-0 lg:pl-6">
-                    {/* Comprovante */}
-                    <div className="mb-4">
-                      <span className="text-sm font-medium text-gray-700 block mb-2">
-                        Comprovante:
-                      </span>
-                      {reg.receiptUrl ? (
-                        reg.receiptUrl.startsWith('/api/receipt/') ? (
-                          <ReceiptImage receiptUrl={reg.receiptUrl} registrationId={reg.id} />
-                        ) : (
-                          <div className="space-y-2">
-                            <div className="relative w-full h-32 bg-gray-100 rounded-lg overflow-hidden">
-                              <Image
-                                src={reg.receiptUrl}
-                                alt="Comprovante"
-                                fill
-                                className="object-contain"
-                              />
-                            </div>
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => setSelectedImage(reg.receiptUrl || null)}
-                                className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors"
-                              >
-                                Abrir
-                              </button>
-                              <a
-                                href={reg.receiptUrl}
-                                download
-                                className="flex-1 px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded-lg transition-colors text-center"
-                              >
-                                Baixar
-                              </a>
-                            </div>
-                          </div>
-                        )
-                      ) : (
-                        <p className="text-gray-500 text-sm">Sem comprovante</p>
-                      )}
-                    </div>
+                        {/* Comprovante */}
+                        <div className="mb-4">
+                          <span className="text-sm font-medium text-gray-700 block mb-2">
+                            Comprovante:
+                          </span>
+                          {reg.receiptUrl ? (
+                            reg.receiptUrl.startsWith('/api/receipt/') ? (
+                              <ReceiptImage receiptUrl={reg.receiptUrl} registrationId={reg.id} />
+                            ) : (
+                              <div className="space-y-2">
+                                <div className="relative w-full h-32 bg-gray-100 rounded-lg overflow-hidden">
+                                  <Image
+                                    src={reg.receiptUrl}
+                                    alt="Comprovante"
+                                    fill
+                                    className="object-contain"
+                                  />
+                                </div>
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => setSelectedImage(reg.receiptUrl || null)}
+                                    className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors"
+                                  >
+                                    Abrir
+                                  </button>
+                                  <a
+                                    href={reg.receiptUrl}
+                                    download
+                                    className="flex-1 px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded-lg transition-colors text-center"
+                                  >
+                                    Baixar
+                                  </a>
+                                </div>
+                              </div>
+                            )
+                          ) : (
+                            <p className="text-gray-500 text-sm">Sem comprovante</p>
+                          )}
+                        </div>
 
-                    {/* Ações de Status */}
-                    <div>
-                      <span className="text-sm font-medium text-gray-700 block mb-2">
-                        Ações:
-                      </span>
-                      <div className="space-y-2">
-                        <button
-                          onClick={() => updatePaymentStatus(reg.id, 'approved')}
-                          disabled={updating === reg.id || reg.paymentStatus === 'approved'}
-                          className={`w-full px-3 py-2 text-sm rounded-lg transition-colors ${
-                            reg.paymentStatus === 'approved'
-                              ? 'bg-green-200 text-green-800 cursor-not-allowed'
-                              : 'bg-green-600 hover:bg-green-700 text-white'
-                          }`}
-                        >
-                          {updating === reg.id ? 'Atualizando...' : '✓ Aprovar'}
-                        </button>
-                        <button
-                          onClick={() => updatePaymentStatus(reg.id, 'rejected')}
-                          disabled={updating === reg.id || reg.paymentStatus === 'rejected'}
-                          className={`w-full px-3 py-2 text-sm rounded-lg transition-colors ${
-                            reg.paymentStatus === 'rejected'
-                              ? 'bg-red-200 text-red-800 cursor-not-allowed'
-                              : 'bg-red-600 hover:bg-red-700 text-white'
-                          }`}
-                        >
-                          {updating === reg.id ? 'Atualizando...' : '✗ Rejeitar'}
-                        </button>
-                        <button
-                          onClick={() => updatePaymentStatus(reg.id, 'pending')}
-                          disabled={updating === reg.id || reg.paymentStatus === 'pending'}
-                          className={`w-full px-3 py-2 text-sm rounded-lg transition-colors ${
-                            reg.paymentStatus === 'pending'
-                              ? 'bg-yellow-200 text-yellow-800 cursor-not-allowed'
-                              : 'bg-yellow-600 hover:bg-yellow-700 text-white'
-                          }`}
-                        >
-                          {updating === reg.id ? 'Atualizando...' : '↩ Pendente'}
-                        </button>
-                      </div>
-                    </div>
+                        {/* Ações de Status */}
+                        <div>
+                          <span className="text-sm font-medium text-gray-700 block mb-2">
+                            Ações:
+                          </span>
+                          <div className="space-y-2">
+                            <button
+                              onClick={() => updatePaymentStatus(reg.id, 'approved')}
+                              disabled={updating === reg.id || reg.paymentStatus === 'approved'}
+                              className={`w-full px-3 py-2 text-sm rounded-lg transition-colors ${
+                                reg.paymentStatus === 'approved'
+                                  ? 'bg-green-200 text-green-800 cursor-not-allowed'
+                                  : 'bg-green-600 hover:bg-green-700 text-white'
+                              }`}
+                            >
+                              {updating === reg.id ? 'Atualizando...' : '✓ Aprovar'}
+                            </button>
+                            <button
+                              onClick={() => updatePaymentStatus(reg.id, 'rejected')}
+                              disabled={updating === reg.id || reg.paymentStatus === 'rejected'}
+                              className={`w-full px-3 py-2 text-sm rounded-lg transition-colors ${
+                                reg.paymentStatus === 'rejected'
+                                  ? 'bg-red-200 text-red-800 cursor-not-allowed'
+                                  : 'bg-red-600 hover:bg-red-700 text-white'
+                              }`}
+                            >
+                              {updating === reg.id ? 'Atualizando...' : '✗ Rejeitar'}
+                            </button>
+                            <button
+                              onClick={() => updatePaymentStatus(reg.id, 'pending')}
+                              disabled={updating === reg.id || reg.paymentStatus === 'pending'}
+                              className={`w-full px-3 py-2 text-sm rounded-lg transition-colors ${
+                                reg.paymentStatus === 'pending'
+                                  ? 'bg-yellow-200 text-yellow-800 cursor-not-allowed'
+                                  : 'bg-yellow-600 hover:bg-yellow-700 text-white'
+                              }`}
+                            >
+                              {updating === reg.id ? 'Atualizando...' : '↩ Pendente'}
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
