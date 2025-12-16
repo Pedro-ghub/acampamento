@@ -308,29 +308,47 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
                                       {fullDataCache[reg.id]?.nomeAcampante || reg.name}
                                     </p>
                                   </div>
+                                  {fullDataCache[reg.id]?.generoAcampante && (
+                                    <div>
+                                      <span className="text-sm font-medium text-gray-700">Gênero:</span>
+                                      <p className="text-gray-900 capitalize">{fullDataCache[reg.id].generoAcampante}</p>
+                                    </div>
+                                  )}
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Idade:</span>
+                                    <p className="text-gray-900">{fullDataCache[reg.id]?.idadeAcampante || reg.age || '-'} anos</p>
+                                  </div>
+                                  {fullDataCache[reg.id]?.dataNascimentoAcampante && (
+                                    <div>
+                                      <span className="text-sm font-medium text-gray-700">Data de Nascimento:</span>
+                                      <p className="text-gray-900">
+                                        {new Date(fullDataCache[reg.id].dataNascimentoAcampante).toLocaleDateString('pt-BR')}
+                                      </p>
+                                    </div>
+                                  )}
                                   <div>
                                     <span className="text-sm font-medium text-gray-700">Telefone:</span>
                                     <div className="flex items-center gap-2 mt-1">
                                       <a
-                                        href={`https://wa.me/55${reg.phone.replace(/\D/g, '')}`}
+                                        href={`https://wa.me/55${(fullDataCache[reg.id]?.celularResponsavelLegal || reg.phone).replace(/\D/g, '')}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-blue-600 hover:underline"
                                       >
-                                        {reg.phone}
+                                        {fullDataCache[reg.id]?.celularResponsavelLegal || reg.phone}
                                       </a>
                                       <button
-                                        onClick={() => copyPhone(reg.phone)}
+                                        onClick={() => copyPhone(fullDataCache[reg.id]?.celularResponsavelLegal || reg.phone)}
                                         className="text-gray-400 hover:text-gray-600"
                                       >
                                         📋
                                       </button>
                                     </div>
                                   </div>
-                                  {reg.age && (
+                                  {fullDataCache[reg.id]?.nomeResponsavelLegal && (
                                     <div>
-                                      <span className="text-sm font-medium text-gray-700">Idade:</span>
-                                      <p className="text-gray-900">{reg.age} anos</p>
+                                      <span className="text-sm font-medium text-gray-700">Responsável Legal:</span>
+                                      <p className="text-gray-900">{fullDataCache[reg.id].nomeResponsavelLegal}</p>
                                     </div>
                                   )}
                                   {reg.city && (
@@ -346,8 +364,124 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
                                       {reg.wantsShirt === 'true' && reg.shirtSize && ` (${reg.shirtSize})`}
                                     </p>
                                   </div>
+                                  {fullDataCache[reg.id]?.observacoes && (
+                                    <div className="md:col-span-2">
+                                      <span className="text-sm font-medium text-gray-700">Observações:</span>
+                                      <p className="text-gray-900 text-sm mt-1 bg-yellow-50 p-2 rounded border border-yellow-200">
+                                        {fullDataCache[reg.id].observacoes}
+                                      </p>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
+
+                              {fullDataCache[reg.id]?.nomeResponsavel && (
+                                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                  <h4 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-300">
+                                    Dados do Responsável
+                                  </h4>
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                      <span className="text-sm font-medium text-gray-700">Nome:</span>
+                                      <p className="text-gray-900">
+                                        {fullDataCache[reg.id].nomeResponsavel} {fullDataCache[reg.id].sobrenomeResponsavel || ''}
+                                      </p>
+                                    </div>
+                                    {fullDataCache[reg.id].cpfResponsavel && (
+                                      <div>
+                                        <span className="text-sm font-medium text-gray-700">CPF:</span>
+                                        <p className="text-gray-900">{fullDataCache[reg.id].cpfResponsavel}</p>
+                                      </div>
+                                    )}
+                                    {fullDataCache[reg.id].dataNascimentoResponsavel && (
+                                      <div>
+                                        <span className="text-sm font-medium text-gray-700">Data de Nascimento:</span>
+                                        <p className="text-gray-900">
+                                          {new Date(fullDataCache[reg.id].dataNascimentoResponsavel).toLocaleDateString('pt-BR')}
+                                        </p>
+                                      </div>
+                                    )}
+                                    {fullDataCache[reg.id].generoResponsavel && (
+                                      <div>
+                                        <span className="text-sm font-medium text-gray-700">Gênero:</span>
+                                        <p className="text-gray-900 capitalize">{fullDataCache[reg.id].generoResponsavel}</p>
+                                      </div>
+                                    )}
+                                    {fullDataCache[reg.id].celularResponsavel && (
+                                      <div>
+                                        <span className="text-sm font-medium text-gray-700">Celular:</span>
+                                        <div className="flex items-center gap-2 mt-1">
+                                          <a
+                                            href={`https://wa.me/55${fullDataCache[reg.id].celularResponsavel.replace(/\D/g, '')}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 hover:underline"
+                                          >
+                                            {fullDataCache[reg.id].celularResponsavel}
+                                          </a>
+                                          <button
+                                            onClick={() => copyPhone(fullDataCache[reg.id].celularResponsavel)}
+                                            className="text-gray-400 hover:text-gray-600"
+                                          >
+                                            📋
+                                          </button>
+                                        </div>
+                                      </div>
+                                    )}
+                                    {fullDataCache[reg.id].emailResponsavel && (
+                                      <div>
+                                        <span className="text-sm font-medium text-gray-700">E-mail:</span>
+                                        <p className="text-gray-900">{fullDataCache[reg.id].emailResponsavel}</p>
+                                      </div>
+                                    )}
+                                    {(fullDataCache[reg.id].cepResponsavel || fullDataCache[reg.id].cidadeResponsavel) && (
+                                      <div className="md:col-span-2">
+                                        <span className="text-sm font-medium text-gray-700">Endereço:</span>
+                                        <p className="text-gray-900">
+                                          {fullDataCache[reg.id].cepResponsavel && `CEP: ${fullDataCache[reg.id].cepResponsavel}`}
+                                          {fullDataCache[reg.id].numeroResponsavel && `, Nº ${fullDataCache[reg.id].numeroResponsavel}`}
+                                          {fullDataCache[reg.id].cidadeResponsavel && ` - ${fullDataCache[reg.id].cidadeResponsavel}`}
+                                          {fullDataCache[reg.id].estadoResponsavel && `/${fullDataCache[reg.id].estadoResponsavel}`}
+                                        </p>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
+                              {fullDataCache[reg.id]?.nomeSegundoAcampante && (
+                                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                  <h4 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-300">
+                                    Segundo Acampante
+                                  </h4>
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                      <span className="text-sm font-medium text-gray-700">Nome:</span>
+                                      <p className="text-gray-900">{fullDataCache[reg.id].nomeSegundoAcampante}</p>
+                                    </div>
+                                    {fullDataCache[reg.id].generoSegundoAcampante && (
+                                      <div>
+                                        <span className="text-sm font-medium text-gray-700">Gênero:</span>
+                                        <p className="text-gray-900 capitalize">{fullDataCache[reg.id].generoSegundoAcampante}</p>
+                                      </div>
+                                    )}
+                                    {fullDataCache[reg.id].idadeSegundoAcampante && (
+                                      <div>
+                                        <span className="text-sm font-medium text-gray-700">Idade:</span>
+                                        <p className="text-gray-900">{fullDataCache[reg.id].idadeSegundoAcampante} anos</p>
+                                      </div>
+                                    )}
+                                    {fullDataCache[reg.id].dataNascimentoSegundoAcampante && (
+                                      <div>
+                                        <span className="text-sm font-medium text-gray-700">Data de Nascimento:</span>
+                                        <p className="text-gray-900">
+                                          {new Date(fullDataCache[reg.id].dataNascimentoSegundoAcampante).toLocaleDateString('pt-BR')}
+                                        </p>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
                             </div>
 
                             <div className="border-t lg:border-t-0 lg:border-l pt-4 lg:pt-0 lg:pl-6">
