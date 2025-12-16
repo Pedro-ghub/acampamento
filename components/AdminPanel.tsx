@@ -427,62 +427,273 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
                 {/* Conteúdo Expandido */}
                 {isExpanded && (
                   <div className="p-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                      {/* Informações Principais */}
-                      <div className="lg:col-span-2">
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                          <div>
-                            <span className="text-sm font-medium text-gray-700">Telefone:</span>
-                            <div className="flex items-center gap-2 mt-1">
-                              <a
-                                href={`https://wa.me/55${reg.phone.replace(/\D/g, '')}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:underline"
-                              >
-                                {reg.phone}
-                              </a>
-                              <button
-                                onClick={() => copyPhone(reg.phone)}
-                                className="text-gray-400 hover:text-gray-600"
-                                title="Copiar telefone"
-                              >
-                                📋
-                              </button>
-                            </div>
-                          </div>
-
-                          {reg.age && (
-                            <div>
-                              <span className="text-sm font-medium text-gray-700">Idade:</span>
-                              <p className="text-gray-900">{reg.age} anos</p>
-                            </div>
-                          )}
-
-                          {reg.city && (
-                            <div>
-                              <span className="text-sm font-medium text-gray-700">Cidade:</span>
-                              <p className="text-gray-900">{reg.city}</p>
-                            </div>
-                          )}
-
-                          {reg.church && (
-                            <div>
-                              <span className="text-sm font-medium text-gray-700">Igreja:</span>
-                              <p className="text-gray-900">{reg.church}</p>
-                            </div>
-                          )}
-
-                          <div>
-                            <span className="text-sm font-medium text-gray-700">Camiseta:</span>
-                            <p className="text-gray-900">
-                              {reg.wantsShirt === 'true' ? 'Sim' : 'Não'}
-                              {reg.wantsShirt === 'true' && reg.shirtSize && ` (${reg.shirtSize})`}
-                            </p>
-                          </div>
-                        </div>
+                    {loadingFullData.has(reg.id) ? (
+                      <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                        <p className="text-gray-600 text-sm">Carregando dados completos...</p>
                       </div>
+                    ) : (
+                      <div className="space-y-6">
+                        {/* Valor Pago */}
+                        {fullDataCache[reg.id]?.valorTotal && (
+                          <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 border-2 border-blue-200">
+                            <div className="flex items-center justify-between">
+                              <span className="text-lg font-semibold text-gray-900">Valor Total Pago:</span>
+                              <span className="text-2xl font-bold text-blue-700">
+                                R$ {fullDataCache[reg.id].valorTotal.toFixed(2).replace('.', ',')}
+                              </span>
+                            </div>
+                            <div className="mt-2 text-sm text-gray-600">
+                              <span>Inscrição: R$ {fullDataCache[reg.id].valorInscricao?.toFixed(2).replace('.', ',') || '0,00'}</span>
+                              {fullDataCache[reg.id].queroCamisa && (
+                                <span className="ml-4">+ Camisa: R$ {fullDataCache[reg.id].valorCamisa?.toFixed(2).replace('.', ',') || '0,00'}</span>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                          {/* Dados do Acampante */}
+                          <div className="lg:col-span-2 space-y-4">
+                            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                              <h4 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-300">
+                                Dados do Acampante
+                              </h4>
+                              {fullDataCache[reg.id] ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Nome Completo:</span>
+                                    <p className="text-gray-900 font-semibold">{fullDataCache[reg.id].nomeAcampante || reg.name}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Gênero:</span>
+                                    <p className="text-gray-900 capitalize">{fullDataCache[reg.id].generoAcampante || '-'}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Idade:</span>
+                                    <p className="text-gray-900">{fullDataCache[reg.id].idadeAcampante || reg.age || '-'} anos</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Data de Nascimento:</span>
+                                    <p className="text-gray-900">
+                                      {fullDataCache[reg.id].dataNascimentoAcampante 
+                                        ? new Date(fullDataCache[reg.id].dataNascimentoAcampante).toLocaleDateString('pt-BR')
+                                        : '-'}
+                                    </p>
+                                  </div>
+                                  <div className="md:col-span-2">
+                                    <span className="text-sm font-medium text-gray-700">Responsável Legal:</span>
+                                    <p className="text-gray-900">{fullDataCache[reg.id].nomeResponsavelLegal || '-'}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Celular do Responsável:</span>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <a
+                                        href={`https://wa.me/55${(fullDataCache[reg.id].celularResponsavelLegal || reg.phone).replace(/\D/g, '')}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 hover:underline"
+                                      >
+                                        {fullDataCache[reg.id].celularResponsavelLegal || reg.phone}
+                                      </a>
+                                      <button
+                                        onClick={() => copyPhone(fullDataCache[reg.id].celularResponsavelLegal || reg.phone)}
+                                        className="text-gray-400 hover:text-gray-600"
+                                        title="Copiar telefone"
+                                      >
+                                        📋
+                                      </button>
+                                    </div>
+                                  </div>
+                                  {fullDataCache[reg.id].observacoes && (
+                                    <div className="md:col-span-2">
+                                      <span className="text-sm font-medium text-gray-700">Observações:</span>
+                                      <p className="text-gray-900 text-sm mt-1 bg-yellow-50 p-2 rounded border border-yellow-200">
+                                        {fullDataCache[reg.id].observacoes}
+                                      </p>
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Nome:</span>
+                                    <p className="text-gray-900">{reg.name}</p>
+                                  </div>
+                                  {reg.age && (
+                                    <div>
+                                      <span className="text-sm font-medium text-gray-700">Idade:</span>
+                                      <p className="text-gray-900">{reg.age} anos</p>
+                                    </div>
+                                  )}
+                                  {reg.city && (
+                                    <div>
+                                      <span className="text-sm font-medium text-gray-700">Cidade:</span>
+                                      <p className="text-gray-900">{reg.city}</p>
+                                    </div>
+                                  )}
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Telefone:</span>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <a
+                                        href={`https://wa.me/55${reg.phone.replace(/\D/g, '')}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 hover:underline"
+                                      >
+                                        {reg.phone}
+                                      </a>
+                                      <button
+                                        onClick={() => copyPhone(reg.phone)}
+                                        className="text-gray-400 hover:text-gray-600"
+                                        title="Copiar telefone"
+                                      >
+                                        📋
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Dados do Responsável */}
+                            {fullDataCache[reg.id] && (
+                              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                <h4 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-300">
+                                  Dados do Responsável
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Nome:</span>
+                                    <p className="text-gray-900">{fullDataCache[reg.id].nomeResponsavel || '-'}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Sobrenome:</span>
+                                    <p className="text-gray-900">{fullDataCache[reg.id].sobrenomeResponsavel || '-'}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">CPF:</span>
+                                    <p className="text-gray-900">{fullDataCache[reg.id].cpfResponsavel || '-'}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Data de Nascimento:</span>
+                                    <p className="text-gray-900">
+                                      {fullDataCache[reg.id].dataNascimentoResponsavel
+                                        ? new Date(fullDataCache[reg.id].dataNascimentoResponsavel).toLocaleDateString('pt-BR')
+                                        : '-'}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Gênero:</span>
+                                    <p className="text-gray-900 capitalize">{fullDataCache[reg.id].generoResponsavel || '-'}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">CEP:</span>
+                                    <p className="text-gray-900">{fullDataCache[reg.id].cepResponsavel || '-'}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Número:</span>
+                                    <p className="text-gray-900">{fullDataCache[reg.id].numeroResponsavel || '-'}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Cidade:</span>
+                                    <p className="text-gray-900">{fullDataCache[reg.id].cidadeResponsavel || reg.city || '-'}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Estado:</span>
+                                    <p className="text-gray-900">{fullDataCache[reg.id].estadoResponsavel || '-'}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Celular:</span>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <a
+                                        href={`https://wa.me/55${(fullDataCache[reg.id].celularResponsavel || '').replace(/\D/g, '')}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 hover:underline"
+                                      >
+                                        {fullDataCache[reg.id].celularResponsavel || '-'}
+                                      </a>
+                                      {fullDataCache[reg.id].celularResponsavel && (
+                                        <button
+                                          onClick={() => copyPhone(fullDataCache[reg.id].celularResponsavel)}
+                                          className="text-gray-400 hover:text-gray-600"
+                                          title="Copiar telefone"
+                                        >
+                                          📋
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">E-mail:</span>
+                                    <p className="text-gray-900">{fullDataCache[reg.id].emailResponsavel || '-'}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Segundo Acampante (se houver) */}
+                            {fullDataCache[reg.id]?.nomeSegundoAcampante && (
+                              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                <h4 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-300">
+                                  Segundo Acampante
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Nome:</span>
+                                    <p className="text-gray-900">{fullDataCache[reg.id].nomeSegundoAcampante}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Gênero:</span>
+                                    <p className="text-gray-900 capitalize">{fullDataCache[reg.id].generoSegundoAcampante || '-'}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Idade:</span>
+                                    <p className="text-gray-900">{fullDataCache[reg.id].idadeSegundoAcampante || '-'} anos</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Data de Nascimento:</span>
+                                    <p className="text-gray-900">
+                                      {fullDataCache[reg.id].dataNascimentoSegundoAcampante
+                                        ? new Date(fullDataCache[reg.id].dataNascimentoSegundoAcampante).toLocaleDateString('pt-BR')
+                                        : '-'}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Responsável Legal:</span>
+                                    <p className="text-gray-900">{fullDataCache[reg.id].nomeResponsavelLegalSegundo || '-'}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Celular do Responsável:</span>
+                                    <p className="text-gray-900">{fullDataCache[reg.id].celularResponsavelLegalSegundo || '-'}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Informações Adicionais */}
+                            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                              <h4 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-300">
+                                Informações Adicionais
+                              </h4>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <span className="text-sm font-medium text-gray-700">Camiseta:</span>
+                                  <p className="text-gray-900">
+                                    {reg.wantsShirt === 'true' ? 'Sim' : 'Não'}
+                                    {reg.wantsShirt === 'true' && reg.shirtSize && ` (${reg.shirtSize})`}
+                                  </p>
+                                </div>
+                                {reg.city && (
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-700">Cidade:</span>
+                                    <p className="text-gray-900">{reg.city}</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
 
                       {/* Comprovante e Ações */}
                       <div className="border-t lg:border-t-0 lg:border-l pt-4 lg:pt-0 lg:pl-6">
