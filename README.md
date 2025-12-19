@@ -1,4 +1,4 @@
-# Acampamento de Carnaval 2026 - As Coroas do Rei
+# Acampamento de Carnaval 2026 - Vazio
 
 Site do acampamento gospel para jovens e adolescentes.
 

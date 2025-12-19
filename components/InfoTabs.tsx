@@ -38,27 +38,28 @@ export default function InfoTabs() {
           {activeTab === 'descricao' && (
             <div className="animate-fadeIn">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                Prepare-se para uma aventura real!
+                O que está te preenchendo?
               </h2>
-              <div className="space-y-4 text-gray-700 text-lg leading-relaxed">
-                <p>
-                  No <strong>Acampamento de Carnaval 2026</strong>, jovens e adolescentes viverão dias inesquecíveis
-                  descobrindo o que significa fazer parte do <strong>Reino de Deus</strong>.
+              <div className="space-y-6 text-gray-700 text-lg leading-relaxed">
+                <p className="text-xl">
+                  No Acampamento de Carnaval <strong className="text-gray-900">"VAZIO"</strong>, você terá dias intensos de Palavra, comunhão e verdade. Sim, vai ter brincadeiras, dinâmicas e gincanas.
                 </p>
-                <p>
-                  Por meio de brincadeiras, louvor, histórias bíblicas, dinâmicas e gincanas,
-                  eles aprenderão que as verdadeiras coroas não são de ouro,
-                  mas são recebidas quando seguimos o Rei Jesus com fé, amor e obediência.
+                <p className="text-xl">
+                  Mas tudo com um propósito maior: <strong className="text-gray-900">sair do automático e ser iluminado por Cristo</strong>.
                 </p>
-                <p>
-                  Tudo isso em um ambiente seguro, acolhedor e cheio da presença de Deus,
-                  onde cada jovem é convidado a viver como um príncipe ou princesa do Reino.
-                </p>
-              </div>
-              <div className="mt-8 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg">
-                <p className="text-yellow-800 font-semibold text-lg">
-                  ⚠️ Vagas limitadas.
-                </p>
+                <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border-l-4 border-blue-500 shadow-sm">
+                  <p className="text-gray-800 italic text-lg leading-relaxed">
+                    <strong className="text-blue-700">"Envie a Tua luz e a Tua verdade para brilhar sobre a terra, pois eu sou como a terra, vazia e sem forma até que Tu me iluminas."</strong>
+                  </p>
+                  <p className="text-gray-600 text-base mt-3 text-right">
+                    — Thomas de Kempis
+                  </p>
+                </div>
+                <div className="mt-8 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg">
+                  <p className="text-yellow-800 font-semibold text-lg">
+                    ⚠️ Vagas limitadas.
+                  </p>
+                </div>
               </div>
             </div>
           )}
@@ -95,7 +96,7 @@ export default function InfoTabs() {
                   <span className="text-3xl">📍</span>
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1">Local</h3>
-                    <p className="text-gray-700">Jardins de Genebra</p>
+                    <p className="text-gray-700">Quintal do Sol</p>
                   </div>
                 </div>
 

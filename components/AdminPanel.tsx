@@ -262,7 +262,14 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
                             {isExpanded ? '▲' : '▼'}
                           </button>
                           <div className="min-w-0 flex-1">
-                            <h3 className="text-xl font-bold text-gray-900 mb-1 truncate">{reg.name}</h3>
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="text-xl font-bold text-gray-900 truncate">{reg.name}</h3>
+                              {fullDataCache[reg.id]?.observacoes && (
+                                <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs font-semibold rounded-full border border-red-300" title="Possui restrições médicas ou alimentares">
+                                  ⚠️ Restrições
+                                </span>
+                              )}
+                            </div>
                             <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-600">
                               <span className="whitespace-nowrap">ID: {reg.id}</span>
                               <span className="whitespace-nowrap">{formatDate(reg.createdAt)}</span>
@@ -366,8 +373,10 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
                                   </div>
                                   {fullDataCache[reg.id]?.observacoes && (
                                     <div className="md:col-span-2">
-                                      <span className="text-sm font-medium text-gray-700">Observações:</span>
-                                      <p className="text-gray-900 text-sm mt-1 bg-yellow-50 p-2 rounded border border-yellow-200">
+                                      <span className="text-sm font-medium text-red-700 flex items-center gap-2">
+                                        ⚠️ Restrições Médicas ou Alimentares:
+                                      </span>
+                                      <p className="text-gray-900 text-sm mt-1 bg-red-50 p-3 rounded border-2 border-red-300 font-medium">
                                         {fullDataCache[reg.id].observacoes}
                                       </p>
                                     </div>

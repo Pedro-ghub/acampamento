@@ -12,7 +12,7 @@ export default function FormularioPage() {
         <div className="flex items-center gap-2 opacity-60">
           <span className="text-xs font-semibold text-slate-500">Igreja Presbiteriana do Brasil</span>
         </div>
-        <p className="text-[10px] text-slate-300">© 2026 Jardins de Genebra. Todos os direitos reservados.</p>
+        <p className="text-[10px] text-slate-300">© 2026 PRVI UMP & UPA . Todos os direitos reservados.</p>
       </footer>
     </main>
   )

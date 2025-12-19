@@ -17,14 +17,12 @@ export default function HeroSection() {
         <div className="absolute inset-0">
           <Image
             src="/images/foto1.jpg"
-            alt="Acampamento de Carnaval 2026 - As Coroas do Rei"
+            alt="Acampamento de Carnaval 2026 - Vazio"
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-105"
             priority
           />
         </div>
-        {/* Gradiente overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-blue-900/90 via-blue-900/60 to-transparent"></div>
         
         {/* Conteúdo */}
         <div className="relative flex flex-col items-center justify-center text-center p-8 pt-24 gap-6">
@@ -41,7 +39,7 @@ export default function HeroSection() {
               <span className="text-yellow-400">Carnaval 2026</span>
             </h1>
             <h2 className="text-lg md:text-xl font-medium text-white/90">
-              ✨ As Coroas do Rei ✨
+              Vazio
             </h2>
           </div>
           
@@ -49,11 +47,11 @@ export default function HeroSection() {
           <div className="flex flex-wrap justify-center gap-2 w-full max-w-[280px]">
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-black/30 rounded-lg backdrop-blur-sm text-xs text-white/90 border border-white/10">
               <span>📅</span>
-              14 de fevereiro
+              14 - 16 de fevereiro
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-black/30 rounded-lg backdrop-blur-sm text-xs text-white/90 border border-white/10">
               <span>📍</span>
-              Jardins de Genebra
+              Quintal do Sol
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-black/30 rounded-lg backdrop-blur-sm text-xs text-white/90 border border-white/10">
               <span>👥</span>

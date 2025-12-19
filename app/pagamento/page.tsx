@@ -18,7 +18,7 @@ export default function PagamentoPage() {
       </Suspense>
       <footer className="w-full bg-gray-900 text-white py-8 px-4 text-center">
         <p className="text-gray-400 text-sm">
-          © 2026 Jardins de Genebra. Todos os direitos reservados.
+          © 2026 PRVI UMP & UPA . Todos os direitos reservados.
         </p>
       </footer>
     </main>

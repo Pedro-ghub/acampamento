@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        disallow: ['/__adm_acampamento_carnaval_2026__'],
+        disallow: ['/__adm_acampamento_carnaval_2026__', '/admin'],
       },
     ],
   }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { QRCodeSVG } from 'qrcode.react'
+import Image from 'next/image'
 
 interface InscricaoData {
   id: string
@@ -32,42 +32,18 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
   const [inscricao, setInscricao] = useState<InscricaoData | null>(null)
   const [copiado, setCopiado] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [arquivo, setArquivo] = useState<File | null>(null)
+  const [preview, setPreview] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [enviado, setEnviado] = useState(false)
   
-  // Chave PIX - SUBSTITUA pela chave real quando tiver
-  const chavePix = 'pix-acampamento-2026@exemplo.com'
+  // Chave PIX (e-mail)
+  const chavePix = 'elainesgarionemodesto@gmail.com'
   
-  // Função simplificada para CRC16 (para produção, use biblioteca adequada)
-  const calcularCRC16 = (data: string): string => {
-    // Esta é uma versão simplificada. Em produção, implemente o algoritmo CRC16-CCITT correto
-    // Por enquanto, retorna um valor fixo para demonstração
-    return 'ABCD'
-  }
-  
-  // Gerar código PIX Copia e Cola (formato EMV)
-  const gerarCodigoPix = (valor: number) => {
-    const valorFormatado = valor.toFixed(2)
-    const nomeBeneficiario = 'Acampamento Carnaval'
-    const cidade = 'BRASILIA'
-    
-    // Construir payload EMV
-    const payloadFormatIndicator = '000201'
-    const merchantAccountInfo = `26${(25 + chavePix.length).toString().padStart(2, '0')}0014br.gov.bcb.pix01${chavePix.length.toString().padStart(2, '0')}${chavePix}`
-    const merchantCategoryCode = '52040000'
-    const transactionCurrency = '5303986'
-    const transactionAmount = `54${valorFormatado.length.toString().padStart(2, '0')}${valorFormatado}`
-    const countryCode = '5802BR'
-    const merchantName = `59${nomeBeneficiario.length.toString().padStart(2, '0')}${nomeBeneficiario}`
-    const merchantCity = `60${cidade.length.toString().padStart(2, '0')}${cidade}`
-    const additionalDataField = '62070503***'
-    
-    const payload = payloadFormatIndicator + merchantAccountInfo + merchantCategoryCode + 
-                    transactionCurrency + transactionAmount + countryCode + 
-                    merchantName + merchantCity + additionalDataField + '6304'
-    
-    // CRC16 simplificado (em produção, use biblioteca adequada ou gere corretamente)
-    const crc = calcularCRC16(payload)
-    return payload + crc
-  }
+  // WhatsApp para envio do comprovante
+  const whatsappNumero = '5545998193069'
+  const whatsappNome = 'João Pedro Modesto'
+  const whatsappDisplay = '(45) 9819-3069'
 
   useEffect(() => {
     // Buscar dados da inscrição
@@ -112,12 +88,75 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
     buscarInscricao()
   }, [inscricaoId, router])
 
-  const codigoPix = inscricao ? gerarCodigoPix(inscricao.valorTotal) : ''
-
-  const copiarCodigoPix = () => {
-    navigator.clipboard.writeText(codigoPix)
+  const copiarChavePix = () => {
+    navigator.clipboard.writeText(chavePix)
     setCopiado(true)
     setTimeout(() => setCopiado(false), 3000)
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Validar tipo de arquivo
+      const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf']
+      if (!tiposPermitidos.includes(file.type)) {
+        alert('Por favor, envie uma imagem (JPG, PNG, WEBP) ou PDF.')
+        return
+      }
+      
+      // Validar tamanho (máximo 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('O arquivo deve ter no máximo 5MB.')
+        return
+      }
+
+      setArquivo(file)
+      
+      // Criar preview se for imagem
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          setPreview(reader.result as string)
+        }
+        reader.readAsDataURL(file)
+      } else {
+        setPreview(null)
+      }
+    }
+  }
+
+  const handleFinalizar = async () => {
+    // Se houver arquivo, enviar o comprovante
+    if (arquivo) {
+      setIsSubmitting(true)
+      try {
+        const formData = new FormData()
+        formData.append('comprovante', arquivo)
+        formData.append('inscricaoId', inscricaoId)
+
+        const response = await fetch('/api/comprovante', {
+          method: 'POST',
+          body: formData,
+        })
+
+        const result = await response.json()
+
+        if (result.success) {
+          setEnviado(true)
+          alert('Comprovante enviado com sucesso! Sua inscrição será verificada em breve.')
+        } else {
+          throw new Error(result.message || 'Erro ao enviar comprovante')
+        }
+      } catch (error) {
+        console.error('Erro ao enviar comprovante:', error)
+        alert('Erro ao enviar comprovante. Você ainda pode enviar pelo WhatsApp.')
+      } finally {
+        setIsSubmitting(false)
+      }
+    } else {
+      // Se não houver arquivo, apenas confirmar
+      alert('Lembre-se de enviar o comprovante pelo WhatsApp para agilizar a confirmação!')
+    }
   }
 
   const formatarData = (dataISO: string | undefined) => {
@@ -221,7 +260,7 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
           <div className="space-y-4">
             <div className="flex justify-between py-3 border-b border-gray-200">
               <span className="text-gray-700">Evento:</span>
-              <span className="text-gray-900 font-semibold">Acampamento de Carnaval 2026 – As Coroas do Rei</span>
+              <span className="text-gray-900 font-semibold">Acampamento de Carnaval 2026 – Vazio</span>
             </div>
             <div className="flex justify-between py-3 border-b border-gray-200">
               <span className="text-gray-700">Quantidade:</span>
@@ -292,58 +331,129 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
               <ol className="list-decimal list-inside space-y-2 text-gray-700">
                 <li>Abra o aplicativo do seu banco.</li>
                 <li>Acesse a opção PIX.</li>
-                <li>Escolha "Pagar com QR Code" ou "PIX Copia e Cola".</li>
-                <li>Confirme as informações e finalize o pagamento.</li>
-                <li>Após o pagamento, siga para a próxima etapa para envio do comprovante.</li>
+                <li>Escolha "PIX para E-mail" ou "Pix Copia e Cola".</li>
+                <li>Cole o e-mail abaixo ou digite manualmente.</li>
+                <li>Insira o valor de <strong>R$ {inscricao?.valorTotal.toFixed(2)}</strong> e confirme.</li>
+                <li>Após o pagamento, envie uma foto do comprovante pelo WhatsApp.</li>
               </ol>
             </div>
 
-            {/* QR Code e Código PIX */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* QR Code */}
-              <div className="bg-white rounded-lg p-6 text-center">
-                <h3 className="font-semibold text-gray-900 mb-4">QR Code PIX</h3>
-                <div className="flex justify-center mb-4">
-                  <div className="bg-white p-4 rounded-lg border-2 border-gray-200">
-                    {codigoPix && (
-                      <QRCodeSVG
-                        value={codigoPix}
-                        size={200}
-                        level="H"
-                        includeMargin={true}
-                      />
-                    )}
-                  </div>
+            {/* Chave PIX E-mail */}
+            <div className="bg-white rounded-lg p-6">
+              <h3 className="font-semibold text-gray-900 mb-4">Chave PIX (E-mail)</h3>
+              <div className="mb-4">
+                <div className="bg-gray-50 border-2 border-blue-300 rounded-lg p-4 mb-3">
+                  <p className="text-lg text-gray-900 font-mono text-center break-all">
+                    {chavePix}
+                  </p>
                 </div>
-                <p className="text-gray-600 text-sm">Escaneie com o app do seu banco</p>
+                <button
+                  onClick={copiarChavePix}
+                  className={`w-full font-semibold py-3 px-6 rounded-lg transition-colors duration-200 ${
+                    copiado
+                      ? 'bg-green-600 text-white'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  }`}
+                >
+                  {copiado ? '✓ Chave PIX copiada com sucesso!' : 'Copiar chave PIX'}
+                </button>
               </div>
-
-              {/* Código PIX Copia e Cola */}
-              <div className="bg-white rounded-lg p-6">
-                <h3 className="font-semibold text-gray-900 mb-4">PIX Copia e Cola</h3>
-                <div className="mb-4">
-                  <div className="bg-gray-50 border border-gray-300 rounded-lg p-4 mb-3 max-h-32 overflow-y-auto">
-                    <p className="text-xs text-gray-600 break-all font-mono">
-                      {codigoPix || 'Gerando código...'}
-                    </p>
-                  </div>
-                  <button
-                    onClick={copiarCodigoPix}
-                    disabled={!codigoPix}
-                    className={`w-full font-semibold py-3 px-6 rounded-lg transition-colors duration-200 ${
-                      copiado
-                        ? 'bg-green-600 text-white'
-                        : 'bg-blue-600 hover:bg-blue-700 text-white'
-                    }`}
-                  >
-                    {copiado ? '✓ Código PIX copiado com sucesso!' : 'Copiar código PIX'}
-                  </button>
-                </div>
-                <p className="text-gray-600 text-sm">
-                  Chave PIX: <strong>{chavePix}</strong>
+              <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-blue-800 text-center">
+                  <strong>Valor a pagar:</strong>{' '}
+                  <span className="text-2xl font-bold">R$ {inscricao?.valorTotal.toFixed(2)}</span>
                 </p>
               </div>
             </div>
+
+            {/* WhatsApp para envio do comprovante */}
+            <div className="bg-green-50 rounded-lg p-6 border-2 border-green-300">
+              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <span className="text-2xl">📱</span> Envie o comprovante pelo WhatsApp
+              </h3>
+              <div className="flex flex-col md:flex-row items-center gap-4">
+                <div className="flex-1">
+                  <p className="text-gray-700 mb-2">
+                    Após realizar o pagamento, envie a foto do comprovante para:
+                  </p>
+                  <p className="text-lg font-bold text-gray-900">
+                    {whatsappDisplay} - {whatsappNome}
+                  </p>
+                </div>
+                <a
+                  href={`https://wa.me/${whatsappNumero}?text=Olá! Segue o comprovante de pagamento da inscrição ${inscricao?.id} - ${inscricao?.nomeAcampante}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                  </svg>
+                  Abrir WhatsApp
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Anexo de Comprovante (Opcional) */}
+        <div className="bg-white rounded-xl p-6 md:p-8 shadow-lg mb-8 border-2 border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Anexar Comprovante (Opcional)</h2>
+          <p className="text-gray-600 text-sm mb-6">
+            Você pode anexar o comprovante aqui para manter um registro salvo. 
+            <strong className="text-green-700"> A prioridade é enviar pelo WhatsApp acima.</strong>
+          </p>
+          
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="comprovante" className="block text-gray-700 font-semibold mb-2">
+                Anexar comprovante <span className="text-gray-500 text-sm">(opcional)</span>
+              </label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+                <input
+                  type="file"
+                  id="comprovante"
+                  name="comprovante"
+                  accept="image/jpeg,image/jpg,image/png,image/webp,application/pdf"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="comprovante"
+                  className="cursor-pointer flex flex-col items-center"
+                >
+                  <svg className="w-10 h-10 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                  <p className="text-gray-700 font-semibold mb-1">
+                    Clique para selecionar o arquivo
+                  </p>
+                  <p className="text-gray-500 text-xs">
+                    Formatos aceitos: JPG, PNG, WEBP ou PDF (máx. 5MB)
+                  </p>
+                  {arquivo && (
+                    <p className="text-blue-600 text-sm mt-2 font-semibold">
+                      ✓ {arquivo.name}
+                    </p>
+                  )}
+                </label>
+              </div>
+            </div>
+
+            {/* Preview da Imagem */}
+            {preview && (
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-gray-700 font-semibold mb-2 text-sm">Pré-visualização:</p>
+                <div className="relative w-full max-w-xs mx-auto aspect-video">
+                  <Image
+                    src={preview}
+                    alt="Preview do comprovante"
+                    fill
+                    className="object-contain rounded-lg"
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -351,18 +461,28 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
         <div className="bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg p-4 mb-8">
           <p className="text-yellow-800">
             <strong>⚠️ Importante:</strong> A inscrição só será confirmada após a conferência do pagamento.
-            Guarde o comprovante para a próxima etapa.
+            {arquivo ? ' O comprovante anexado será verificado.' : ' Envie o comprovante pelo WhatsApp para agilizar.'}
           </p>
         </div>
 
         {/* Botão Final */}
         <div className="text-center">
           <button
-            onClick={() => router.push(`/comprovante?id=${inscricaoId}`)}
-            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold text-xl md:text-2xl px-12 py-5 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-105"
+            onClick={handleFinalizar}
+            disabled={isSubmitting}
+            className={`inline-block text-white font-bold text-xl md:text-2xl px-12 py-5 rounded-full shadow-2xl transition-all duration-300 transform ${
+              isSubmitting
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 hover:scale-105'
+            }`}
           >
-            Já realizei o pagamento
+            {isSubmitting ? 'Enviando...' : enviado ? '✓ Comprovante enviado!' : 'Já realizei o pagamento'}
           </button>
+          {enviado && (
+            <p className="text-green-600 font-semibold mt-4">
+              ✓ Comprovante enviado com sucesso! Sua inscrição será verificada em breve.
+            </p>
+          )}
         </div>
       </div>
     </section>
