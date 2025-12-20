@@ -147,6 +147,32 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
     }
   }
 
+  // Função para formatar data de nascimento (sem problemas de timezone)
+  const formatarDataNascimento = (dataISO: string | undefined) => {
+    if (!dataISO) return 'Não informado'
+    try {
+      // Se a data está no formato YYYY-MM-DD, tratar como data local
+      // para evitar problemas de timezone que causam diferença de um dia
+      if (typeof dataISO === 'string' && dataISO.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const [ano, mes, dia] = dataISO.split('-').map(Number)
+        const data = new Date(ano, mes - 1, dia) // mês é 0-indexed
+        if (isNaN(data.getTime())) {
+          return 'Data inválida'
+        }
+        return data.toLocaleDateString('pt-BR')
+      }
+      
+      // Para outros formatos, usar conversão normal
+      const data = new Date(dataISO)
+      if (isNaN(data.getTime())) {
+        return 'Data inválida'
+      }
+      return data.toLocaleDateString('pt-BR')
+    } catch (error) {
+      return 'Data inválida'
+    }
+  }
+
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
       pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
@@ -329,7 +355,7 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
                                     <div>
                                       <span className="text-sm font-medium text-gray-700">Data de Nascimento:</span>
                                       <p className="text-gray-900">
-                                        {new Date(fullDataCache[reg.id].dataNascimentoAcampante).toLocaleDateString('pt-BR')}
+                                        {formatarDataNascimento(fullDataCache[reg.id].dataNascimentoAcampante)}
                                       </p>
                                     </div>
                                   )}
@@ -406,7 +432,7 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
                                       <div>
                                         <span className="text-sm font-medium text-gray-700">Data de Nascimento:</span>
                                         <p className="text-gray-900">
-                                          {new Date(fullDataCache[reg.id].dataNascimentoResponsavel).toLocaleDateString('pt-BR')}
+                                          {formatarDataNascimento(fullDataCache[reg.id].dataNascimentoResponsavel)}
                                         </p>
                                       </div>
                                     )}
@@ -484,7 +510,7 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
                                       <div>
                                         <span className="text-sm font-medium text-gray-700">Data de Nascimento:</span>
                                         <p className="text-gray-900">
-                                          {new Date(fullDataCache[reg.id].dataNascimentoSegundoAcampante).toLocaleDateString('pt-BR')}
+                                          {formatarDataNascimento(fullDataCache[reg.id].dataNascimentoSegundoAcampante)}
                                         </p>
                                       </div>
                                     )}
