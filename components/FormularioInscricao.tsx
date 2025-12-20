@@ -205,7 +205,7 @@ export default function FormularioInscricao() {
         {/* Imagem de fundo - fogueira */}
         <div className="absolute inset-0">
           <Image
-            src="/images/foto1.jpg"
+            src="/images/oficial.PNG"
             alt="Fogueira do Acampamento"
             fill
             className="object-cover object-center"

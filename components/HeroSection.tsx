@@ -16,7 +16,7 @@ export default function HeroSection() {
         {/* Imagem de fundo */}
         <div className="absolute inset-0">
           <Image
-            src="/images/foto1.jpg"
+            src="/images/oficial.PNG"
             alt="Acampamento de Carnaval 2026 - Vazio"
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-105"
