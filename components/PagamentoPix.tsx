@@ -183,6 +183,18 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
   const formatarDataNascimento = (dataISO: string | undefined) => {
     if (!dataISO) return 'Não informado'
     try {
+      // Se a data está no formato YYYY-MM-DD, tratar como data local
+      // para evitar problemas de timezone que causam diferença de um dia
+      if (dataISO.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const [ano, mes, dia] = dataISO.split('-').map(Number)
+        const data = new Date(ano, mes - 1, dia) // mês é 0-indexed
+        if (isNaN(data.getTime())) {
+          return 'Data inválida'
+        }
+        return data.toLocaleDateString('pt-BR')
+      }
+      
+      // Para outros formatos, usar conversão normal
       const data = new Date(dataISO)
       if (isNaN(data.getTime())) {
         return 'Data inválida'
@@ -195,7 +207,7 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
 
   if (loading) {
     return (
-      <section className="w-full bg-gradient-to-b from-blue-50 to-white py-12 px-4">
+      <section className="w-full bg-gradient-to-b from-red-50 to-white py-12 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-gray-600">Carregando informações...</p>
         </div>
@@ -205,7 +217,7 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
 
   if (!inscricao) {
     return (
-      <section className="w-full bg-gradient-to-b from-blue-50 to-white py-12 px-4">
+      <section className="w-full bg-gradient-to-b from-red-50 to-white py-12 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-gray-600">Inscrição não encontrada.</p>
         </div>
@@ -214,11 +226,11 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
   }
 
   return (
-    <section className="w-full bg-gradient-to-b from-blue-50 to-white py-12 px-4">
+    <section className="w-full bg-gradient-to-b from-red-50 to-white py-12 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Título Principal */}
         <div className="text-center mb-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-blue-900 mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-red-900 mb-4">
             Inscrição recebida
           </h1>
           <p className="text-gray-700 text-lg md:text-xl max-w-2xl mx-auto">
@@ -228,7 +240,7 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
         </div>
 
         {/* Resumo da Inscrição */}
-        <div className="bg-white rounded-xl p-6 md:p-8 shadow-lg mb-8 border-2 border-blue-200">
+        <div className="bg-white rounded-xl p-6 md:p-8 shadow-lg mb-8 border-2 border-red-200">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Resumo da Inscrição</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -245,7 +257,7 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
             </div>
             <div>
               <p className="text-gray-600 text-sm mb-1">Valor total</p>
-              <p className="text-blue-600 font-bold text-2xl">R$ {inscricao.valorTotal.toFixed(2)}</p>
+              <p className="text-red-600 font-bold text-2xl">R$ {inscricao.valorTotal.toFixed(2)}</p>
             </div>
             <div className="md:col-span-2">
               <p className="text-gray-600 text-sm mb-1">Forma de pagamento</p>
@@ -278,9 +290,9 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
                 </span>
               </div>
             )}
-            <div className="flex justify-between py-3 bg-blue-50 rounded-lg px-4">
+            <div className="flex justify-between py-3 bg-red-50 rounded-lg px-4">
               <span className="text-gray-900 font-bold text-lg">Total:</span>
-              <span className="text-blue-600 font-bold text-xl">R$ {inscricao.valorTotal.toFixed(2)}</span>
+              <span className="text-red-600 font-bold text-xl">R$ {inscricao.valorTotal.toFixed(2)}</span>
             </div>
           </div>
 
@@ -319,8 +331,8 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
         </div>
 
         {/* Seção de Pagamento PIX */}
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 md:p-8 shadow-lg border-2 border-blue-200 mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-blue-300">
+        <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-6 md:p-8 shadow-lg border-2 border-red-200 mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-red-300">
             Pagamento via PIX
           </h2>
           
@@ -342,7 +354,7 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
             <div className="bg-white rounded-lg p-6">
               <h3 className="font-semibold text-gray-900 mb-4">Chave PIX (E-mail)</h3>
               <div className="mb-4">
-                <div className="bg-gray-50 border-2 border-blue-300 rounded-lg p-4 mb-3">
+                <div className="bg-gray-50 border-2 border-red-300 rounded-lg p-4 mb-3">
                   <p className="text-lg text-gray-900 font-mono text-center break-all">
                     {chavePix}
                   </p>
@@ -352,14 +364,14 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
                   className={`w-full font-semibold py-3 px-6 rounded-lg transition-colors duration-200 ${
                     copiado
                       ? 'bg-green-600 text-white'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-red-600 hover:bg-red-700 text-white'
                   }`}
                 >
                   {copiado ? '✓ Chave PIX copiada com sucesso!' : 'Copiar chave PIX'}
                 </button>
               </div>
-              <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-blue-800 text-center">
+              <div className="mt-4 p-4 bg-red-50 rounded-lg border border-red-200">
+                <p className="text-red-800 text-center">
                   <strong>Valor a pagar:</strong>{' '}
                   <span className="text-2xl font-bold">R$ {inscricao?.valorTotal.toFixed(2)}</span>
                 </p>
@@ -409,7 +421,7 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
               <label htmlFor="comprovante" className="block text-gray-700 font-semibold mb-2">
                 Anexar comprovante <span className="text-gray-500 text-sm">(opcional)</span>
               </label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-red-400 transition-colors">
                 <input
                   type="file"
                   id="comprovante"
@@ -432,7 +444,7 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
                     Formatos aceitos: JPG, PNG, WEBP ou PDF (máx. 5MB)
                   </p>
                   {arquivo && (
-                    <p className="text-blue-600 text-sm mt-2 font-semibold">
+                    <p className="text-red-600 text-sm mt-2 font-semibold">
                       ✓ {arquivo.name}
                     </p>
                   )}
@@ -473,7 +485,7 @@ export default function PagamentoPix({ inscricaoId }: PagamentoPixProps) {
             className={`inline-block text-white font-bold text-xl md:text-2xl px-12 py-5 rounded-full shadow-2xl transition-all duration-300 transform ${
               isSubmitting
                 ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700 hover:scale-105'
+                : 'bg-red-600 hover:bg-red-700 hover:scale-105'
             }`}
           >
             {isSubmitting ? 'Enviando...' : enviado ? '✓ Comprovante enviado!' : 'Já realizei o pagamento'}

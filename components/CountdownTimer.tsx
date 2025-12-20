@@ -48,9 +48,9 @@ export default function CountdownTimer() {
 
   if (hasStarted) {
     return (
-      <section className="w-full bg-gradient-to-b from-blue-50 to-white py-16 px-4">
+      <section className="w-full bg-gradient-to-b from-red-50 to-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-red-900 mb-4">
             O acampamento já começou!
           </h2>
           <p className="text-gray-700 text-lg">
@@ -69,7 +69,7 @@ export default function CountdownTimer() {
       <div className="flex items-center justify-center gap-3 sm:gap-4">
         <div className="flex flex-col items-center gap-1">
           <div className="flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-slate-50 rounded-full border-2 border-slate-100">
-            <span className="text-xl sm:text-2xl font-bold text-blue-900">{timeLeft.days}</span>
+            <span className="text-xl sm:text-2xl font-bold text-red-900">{timeLeft.days}</span>
           </div>
           <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Dias</span>
         </div>

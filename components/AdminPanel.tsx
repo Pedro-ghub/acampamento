@@ -173,7 +173,7 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Carregando inscrições...</p>
         </div>
       </div>
@@ -207,7 +207,7 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Nome ou telefone..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
               />
             </div>
             <div>
@@ -215,7 +215,7 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
               <select
                 value={paymentFilter}
                 onChange={(e) => setPaymentFilter(e.target.value as any)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
               >
                 <option value="all">Todos</option>
                 <option value="pending">Pendente</option>
@@ -228,7 +228,7 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
               <select
                 value={shirtFilter}
                 onChange={(e) => setShirtFilter(e.target.value as any)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
               >
                 <option value="all">Todos</option>
                 <option value="with">Somente com camiseta</option>
@@ -273,7 +273,7 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
                             <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-600">
                               <span className="whitespace-nowrap">ID: {reg.id}</span>
                               <span className="whitespace-nowrap">{formatDate(reg.createdAt)}</span>
-                              {reg.phone && <span className="text-blue-600 truncate">{reg.phone}</span>}
+                              {reg.phone && <span className="text-red-600 truncate">{reg.phone}</span>}
                             </div>
                           </div>
                         </div>
@@ -286,16 +286,16 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
                     <div className="p-6">
                       {loadingFullData.has(reg.id) ? (
                         <div className="text-center py-8">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto mb-2"></div>
                           <p className="text-gray-600 text-sm">Carregando dados completos...</p>
                         </div>
                       ) : (
                         <div className="space-y-6">
                           {fullDataCache[reg.id]?.valorTotal && (
-                            <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 border-2 border-blue-200">
+                            <div className="bg-gradient-to-r from-red-50 to-red-100 rounded-lg p-4 border-2 border-red-200">
                               <div className="flex items-center justify-between">
                                 <span className="text-lg font-semibold text-gray-900">Valor Total:</span>
-                                <span className="text-2xl font-bold text-blue-700">
+                                <span className="text-2xl font-bold text-red-700">
                                   R$ {fullDataCache[reg.id].valorTotal.toFixed(2).replace('.', ',')}
                                 </span>
                               </div>
@@ -340,7 +340,7 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
                                         href={`https://wa.me/55${(fullDataCache[reg.id]?.celularResponsavelLegal || reg.phone).replace(/\D/g, '')}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-blue-600 hover:underline"
+                                        className="text-red-600 hover:underline"
                                       >
                                         {fullDataCache[reg.id]?.celularResponsavelLegal || reg.phone}
                                       </a>
@@ -424,7 +424,7 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
                                             href={`https://wa.me/55${fullDataCache[reg.id].celularResponsavel.replace(/\D/g, '')}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-blue-600 hover:underline"
+                                            className="text-red-600 hover:underline"
                                           >
                                             {fullDataCache[reg.id].celularResponsavel}
                                           </a>
@@ -506,7 +506,7 @@ export default function AdminPanel({ adminKey }: AdminPanelProps) {
                                       </div>
                                       <button
                                         onClick={() => setSelectedImage(reg.receiptUrl || null)}
-                                        className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg"
+                                        className="w-full px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg"
                                       >
                                         Abrir
                                       </button>

@@ -61,7 +61,7 @@ export default function ReceiptImage({ receiptUrl, registrationId }: ReceiptImag
             document.body.appendChild(modal)
             modal.querySelector('button')?.addEventListener('click', () => modal.remove())
           }}
-          className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors"
+          className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors"
         >
           Abrir
         </button>

@@ -12,7 +12,7 @@ export default function HeroSection() {
 
   return (
     <div className="p-4 pb-0">
-      <div className="relative w-full overflow-hidden rounded-xl bg-blue-900 shadow-xl group">
+      <div className="relative w-full overflow-hidden rounded-xl bg-red-900 shadow-xl group">
         {/* Imagem de fundo */}
         <div className="absolute inset-0">
           <Image

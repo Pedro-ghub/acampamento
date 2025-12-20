@@ -39,12 +39,51 @@ export default function FormularioInscricao() {
     celularResponsavelLegalSegundo: '',
   })
 
+  // Função para formatar telefone
+  const formatarTelefone = (valor: string): string => {
+    // Remove tudo que não é número
+    const apenasNumeros = valor.replace(/\D/g, '')
+    
+    // Limita a 11 dígitos (com DDD + 9 dígitos)
+    const numerosLimitados = apenasNumeros.slice(0, 11)
+    
+    // Aplica a máscara
+    if (numerosLimitados.length <= 10) {
+      // Telefone fixo: (XX) XXXX-XXXX
+      return numerosLimitados
+        .replace(/(\d{2})(\d)/, '($1) $2')
+        .replace(/(\d{4})(\d)/, '$1-$2')
+    } else {
+      // Celular: (XX) XXXXX-XXXX
+      return numerosLimitados
+        .replace(/(\d{2})(\d)/, '($1) $2')
+        .replace(/(\d{5})(\d)/, '$1-$2')
+    }
+  }
+
+  // Função para validar telefone
+  const validarTelefone = (valor: string): boolean => {
+    const apenasNumeros = valor.replace(/\D/g, '')
+    // Deve ter pelo menos 10 dígitos (DDD + número)
+    return apenasNumeros.length >= 10 && apenasNumeros.length <= 11
+  }
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
+    
+    // Se for um campo de telefone, aplicar formatação
+    if (name === 'celularResponsavel' || name === 'celularResponsavelLegal') {
+      const valorFormatado = formatarTelefone(value)
+      setFormData(prev => ({
+        ...prev,
+        [name]: valorFormatado
+      }))
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }))
+    }
   }
 
   // Função para calcular o valor baseado na data
@@ -83,11 +122,22 @@ export default function FormularioInscricao() {
   }
 
   const valorInscricao = calcularValor()
-  const valorCamisa = 250
+  const valorCamisa = 40
   const valorTotal = valorInscricao + (queroCamisa ? valorCamisa : 0)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Validar telefones
+    if (!validarTelefone(formData.celularResponsavel)) {
+      alert('Por favor, informe um telefone válido para o responsável (com DDD).')
+      return
+    }
+    
+    if (!validarTelefone(formData.celularResponsavelLegal)) {
+      alert('Por favor, informe um telefone válido para o acampante (com DDD).')
+      return
+    }
     
     if (queroCamisa && !tamanhoCamisa) {
       alert('Por favor, selecione o tamanho da camisa.')
@@ -186,7 +236,7 @@ export default function FormularioInscricao() {
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* 1. DADOS DO RESPONSÁVEL */}
           <div className="bg-white rounded-xl p-6 md:p-8 shadow-lg">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-blue-200">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-red-200">
               Dados do Responsável
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -201,7 +251,7 @@ export default function FormularioInscricao() {
                   value={formData.nomeResponsavel}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 />
               </div>
 
@@ -216,7 +266,7 @@ export default function FormularioInscricao() {
                   value={formData.cidadeResponsavel}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 />
               </div>
 
@@ -232,15 +282,19 @@ export default function FormularioInscricao() {
                   onChange={handleInputChange}
                   required
                   placeholder="(00) 00000-0000"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  maxLength={15}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 />
+                {formData.celularResponsavel && !validarTelefone(formData.celularResponsavel) && (
+                  <p className="text-red-500 text-sm mt-1">Informe um telefone válido com DDD</p>
+                )}
               </div>
             </div>
           </div>
 
           {/* 2. INFORMAÇÕES DO ACAMPANTE */}
           <div className="bg-white rounded-xl p-6 md:p-8 shadow-lg">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-blue-200">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-red-200">
               Informações do Acampante
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -255,7 +309,7 @@ export default function FormularioInscricao() {
                   value={formData.nomeAcampante}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 />
               </div>
 
@@ -269,7 +323,7 @@ export default function FormularioInscricao() {
                   value={formData.generoAcampante}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 >
                   <option value="">Selecione</option>
                   <option value="masculino">Masculino</option>
@@ -288,7 +342,7 @@ export default function FormularioInscricao() {
                   value={formData.dataNascimentoAcampante}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 />
               </div>
 
@@ -304,8 +358,12 @@ export default function FormularioInscricao() {
                   onChange={handleInputChange}
                   required
                   placeholder="(00) 00000-0000"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  maxLength={15}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 />
+                {formData.celularResponsavelLegal && !validarTelefone(formData.celularResponsavelLegal) && (
+                  <p className="text-red-500 text-sm mt-1">Informe um telefone válido com DDD</p>
+                )}
               </div>
 
               <div className="md:col-span-2">
@@ -318,7 +376,7 @@ export default function FormularioInscricao() {
                   value={formData.observacoes}
                   onChange={handleInputChange}
                   rows={4}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   placeholder="Descreva aqui qualquer restrição médica ou alimentar..."
                 />
               </div>
@@ -326,8 +384,8 @@ export default function FormularioInscricao() {
           </div>
 
           {/* 3. OPÇÃO DE CAMISA */}
-          <div className="bg-white rounded-xl p-6 md:p-8 shadow-lg border-2 border-blue-200">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-blue-200">
+          <div className="bg-white rounded-xl p-6 md:p-8 shadow-lg border-2 border-red-200">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-red-200">
               Camisa do Acampamento
             </h2>
             <div className="space-y-6">
@@ -342,61 +400,67 @@ export default function FormularioInscricao() {
                       setTamanhoCamisa('')
                     }
                   }}
-                  className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500"
                 />
                 <label htmlFor="queroCamisa" className="text-gray-700 font-semibold text-lg cursor-pointer">
                   Desejo adquirir a camisa do acampamento (+ R$ {valorCamisa.toFixed(2)})
                 </label>
               </div>
 
-              {queroCamisa && (
-                <div className="animate-fadeIn">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Imagem da Camisa */}
-                    <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-center">
-                      <div className="relative w-full max-w-xs aspect-square">
-                        <Image
-                          src="/images/camisa.jpg"
-                          alt="Camisa do Acampamento"
-                          fill
-                          className="object-contain rounded-lg"
-                        />
-                      </div>
+              <div className="animate-fadeIn">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Imagens das Camisas */}
+                  <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-center gap-4">
+                    <div className="relative w-1/2 aspect-square">
+                      <Image
+                        src="/images/camisa.jpg"
+                        alt="Camisa do Acampamento"
+                        fill
+                        className="object-contain rounded-lg"
+                      />
                     </div>
-
-                    {/* Campo de Tamanho */}
-                    <div className="flex flex-col justify-center">
-                      <label htmlFor="tamanhoCamisa" className="block text-gray-700 font-semibold mb-2">
-                        Tamanho da camisa <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        id="tamanhoCamisa"
-                        value={tamanhoCamisa}
-                        onChange={(e) => setTamanhoCamisa(e.target.value)}
-                        required={queroCamisa}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      >
-                        <option value="">Selecione o tamanho</option>
-                        <option value="PP">PP</option>
-                        <option value="P">P</option>
-                        <option value="M">M</option>
-                        <option value="G">G</option>
-                        <option value="GG">GG</option>
-                        <option value="XG">XG</option>
-                      </select>
-                      <p className="text-gray-600 text-sm mt-2">
-                        Selecione o tamanho desejado para a camisa
-                      </p>
+                    <div className="relative w-1/2 aspect-square">
+                      <Image
+                        src="/images/camisafem.jpg"
+                        alt="Camisa Feminina do Acampamento"
+                        fill
+                        className="object-contain rounded-lg"
+                      />
                     </div>
                   </div>
+
+                  {/* Campo de Tamanho */}
+                  <div className="flex flex-col justify-center">
+                    <label htmlFor="tamanhoCamisa" className="block text-gray-700 font-semibold mb-2">
+                      Tamanho da camisa {queroCamisa && <span className="text-red-500">*</span>}
+                    </label>
+                    <select
+                      id="tamanhoCamisa"
+                      value={tamanhoCamisa}
+                      onChange={(e) => setTamanhoCamisa(e.target.value)}
+                      required={queroCamisa}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    >
+                      <option value="">Selecione o tamanho</option>
+                      <option value="PP">PP</option>
+                      <option value="P">P</option>
+                      <option value="M">M</option>
+                      <option value="G">G</option>
+                      <option value="GG">GG</option>
+                      <option value="XG">XG</option>
+                    </select>
+                    <p className="text-gray-600 text-sm mt-2">
+                      Selecione o tamanho desejado para a camisa
+                    </p>
+                  </div>
                 </div>
-              )}
+              </div>
             </div>
           </div>
 
           {/* 4. SEÇÃO DE PAGAMENTO - PIX */}
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 md:p-8 shadow-lg border-2 border-blue-200">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-blue-300">
+          <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-6 md:p-8 shadow-lg border-2 border-red-200">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-red-300">
               Forma de Pagamento
             </h2>
             <div className="space-y-4">
@@ -411,7 +475,7 @@ export default function FormularioInscricao() {
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className="flex items-center gap-2">
                       <span className="text-gray-700 font-semibold text-lg">Valor da inscrição:</span>
-                      <span className="text-blue-600 font-bold text-xl">
+                      <span className="text-red-600 font-bold text-xl">
                         R$ {valorInscricao.toFixed(2)}
                       </span>
                     </div>
@@ -419,7 +483,7 @@ export default function FormularioInscricao() {
                       <div className="flex items-center gap-2">
                         <span className="text-gray-500">+</span>
                         <span className="text-gray-700 font-semibold text-lg">Camisa:</span>
-                        <span className="text-blue-600 font-bold text-xl">
+                        <span className="text-red-600 font-bold text-xl">
                           R$ {valorCamisa.toFixed(2)}
                         </span>
                       </div>
@@ -427,7 +491,7 @@ export default function FormularioInscricao() {
                   </div>
                   <div className="pt-3 border-t border-gray-300 flex items-center justify-between">
                     <span className="text-gray-900 font-bold text-lg">Valor total:</span>
-                    <span className="text-blue-600 font-bold text-2xl">
+                    <span className="text-red-600 font-bold text-2xl">
                       R$ {valorTotal.toFixed(2)}
                     </span>
                   </div>
@@ -453,7 +517,7 @@ export default function FormularioInscricao() {
               className={`inline-block text-white font-bold text-xl md:text-2xl px-12 py-5 rounded-full shadow-2xl transition-all duration-300 transform ${
                 isSubmitting
                   ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700 hover:scale-105'
+                  : 'bg-red-600 hover:bg-red-700 hover:scale-105'
               }`}
             >
               {isSubmitting ? 'Salvando...' : 'Continuar para pagamento'}

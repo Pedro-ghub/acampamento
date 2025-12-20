@@ -14,8 +14,8 @@ export default function InfoTabs() {
             onClick={() => setActiveTab('descricao')}
             className={`flex-1 py-4 px-6 text-center font-semibold text-lg transition-all duration-300 ${
               activeTab === 'descricao'
-                ? 'text-blue-600 border-b-4 border-blue-600 bg-blue-50'
-                : 'text-gray-600 hover:text-blue-500 hover:bg-gray-50'
+                ? 'text-red-600 border-b-4 border-red-600 bg-red-50'
+                : 'text-gray-600 hover:text-red-500 hover:bg-gray-50'
             }`}
           >
             Descrição
@@ -24,8 +24,8 @@ export default function InfoTabs() {
             onClick={() => setActiveTab('informacoes')}
             className={`flex-1 py-4 px-6 text-center font-semibold text-lg transition-all duration-300 ${
               activeTab === 'informacoes'
-                ? 'text-blue-600 border-b-4 border-blue-600 bg-blue-50'
-                : 'text-gray-600 hover:text-blue-500 hover:bg-gray-50'
+                ? 'text-red-600 border-b-4 border-red-600 bg-red-50'
+                : 'text-gray-600 hover:text-red-500 hover:bg-gray-50'
             }`}
           >
             Informações adicionais
@@ -47,9 +47,9 @@ export default function InfoTabs() {
                 <p className="text-xl">
                   Mas tudo com um propósito maior: <strong className="text-gray-900">sair do automático e ser iluminado por Cristo</strong>.
                 </p>
-                <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border-l-4 border-blue-500 shadow-sm">
+                <div className="mt-8 p-6 bg-gradient-to-r from-red-50 to-red-100 rounded-xl border-l-4 border-red-500 shadow-sm">
                   <p className="text-gray-800 italic text-lg leading-relaxed">
-                    <strong className="text-blue-700">"Envie a Tua luz e a Tua verdade para brilhar sobre a terra, pois eu sou como a terra, vazia e sem forma até que Tu me iluminas."</strong>
+                    <strong className="text-red-700">"Envie a Tua luz e a Tua verdade para brilhar sobre a terra, pois eu sou como a terra, vazia e sem forma até que Tu me iluminas."</strong>
                   </p>
                   <p className="text-gray-600 text-base mt-3 text-right">
                     — Thomas de Kempis
@@ -72,7 +72,7 @@ export default function InfoTabs() {
               </h2>
               <div className="space-y-6">
                 {/* Data */}
-                <div className="flex items-start gap-4 p-4 bg-blue-50 rounded-lg">
+                <div className="flex items-start gap-4 p-4 bg-red-50 rounded-lg">
                   <span className="text-3xl">📅</span>
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1">Data</h3>
@@ -144,7 +144,7 @@ export default function InfoTabs() {
         <div className="mt-12 text-center">
           <a
             href="/formulario"
-            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold text-xl md:text-2xl px-10 py-5 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-105"
+            className="inline-block bg-red-600 hover:bg-red-700 text-white font-bold text-xl md:text-2xl px-10 py-5 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-105"
           >
             Ir para o formulário de inscrição
           </a>

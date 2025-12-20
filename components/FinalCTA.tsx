@@ -13,7 +13,7 @@ export default function FinalCTA() {
     <>
       <div className="h-8"></div>
       <div className="sticky bottom-4 left-4 right-4 z-40 px-4">
-        <div className="bg-blue-900 rounded-xl p-4 shadow-xl shadow-blue-900/20 border border-white/10 flex flex-col gap-3 animate-pulse-soft">
+        <div className="bg-red-900 rounded-xl p-4 shadow-xl shadow-red-900/20 border border-white/10 flex flex-col gap-3 animate-pulse-soft">
           <div className="flex items-start gap-3">
             <div className="p-2 bg-white/10 rounded-full shrink-0">
               <span className="text-yellow-400 text-xl">✓</span>
@@ -27,7 +27,7 @@ export default function FinalCTA() {
           </div>
           <button
             onClick={handleInscricao}
-            className="w-full h-11 bg-white text-blue-900 font-bold text-sm rounded-full flex items-center justify-center gap-2 shadow-sm hover:bg-slate-50 transition-colors"
+            className="w-full h-11 bg-white text-red-900 font-bold text-sm rounded-full flex items-center justify-center gap-2 shadow-sm hover:bg-slate-50 transition-colors"
           >
             Inscrever agora
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

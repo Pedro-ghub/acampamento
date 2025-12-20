@@ -32,10 +32,8 @@ export default function MusicSection() {
       window.onYouTubeIframeAPIReady = () => {
         if (containerRef.current && !playerRef.current) {
           const player = new window.YT.Player(containerRef.current, {
-            videoId: 'ePdRgBWhvog',
+            videoId: 'fOBGrF-bQbA',
             playerVars: {
-              list: 'PLcJwc2EmHcCZ9ZoKdbZhxIKQv4RVvnNbc',
-              listType: 'playlist',
               autoplay: 1,
               mute: 0,
               loop: 1,
@@ -326,7 +324,7 @@ export default function MusicSection() {
       />
 
       <div className="flex flex-col items-center text-center gap-2 mb-6">
-        <div className="inline-flex items-center justify-center p-2 bg-blue-900/10 rounded-full text-blue-900 mb-1">
+        <div className="inline-flex items-center justify-center p-2 bg-red-900/10 rounded-full text-red-900 mb-1">
           <span className="text-2xl">🎵</span>
         </div>
         <h3 className="text-xl font-bold text-slate-800">Playlist do Reino</h3>
@@ -335,15 +333,15 @@ export default function MusicSection() {
         </p>
       </div>
 
-      <div className="relative w-full rounded-2xl overflow-hidden shadow-xl shadow-blue-900/10 bg-white border border-slate-100">
+      <div className="relative w-full rounded-2xl overflow-hidden shadow-xl shadow-red-900/10 bg-white border border-slate-100">
         {/* Background blur */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100 blur-2xl opacity-50 scale-125"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-red-50 to-red-100 blur-2xl opacity-50 scale-125"></div>
         
         <div className="relative p-5 flex flex-col gap-5 z-10">
           <div className="flex items-center gap-4">
             {/* Capa do álbum */}
             <div className="relative size-20 shrink-0 rounded-xl overflow-hidden shadow-lg group cursor-pointer">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center">
+              <div className="absolute inset-0 bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center">
                 <span className="text-3xl text-white">🎵</span>
               </div>
               {isPlaying && (
@@ -365,7 +363,7 @@ export default function MusicSection() {
                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
                   </span>
                 )}
-                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-900">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-red-900">
                   {isPlaying ? 'Tocando agora' : 'Pausado'}
                 </span>
               </div>
@@ -378,7 +376,7 @@ export default function MusicSection() {
           <div className="flex flex-col gap-2 w-full">
             <div className="relative h-1.5 w-full bg-slate-100 rounded-full overflow-hidden cursor-pointer group">
               <div 
-                className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-900 to-blue-600 rounded-full transition-all duration-100"
+                className="absolute top-0 left-0 h-full bg-gradient-to-r from-red-900 to-red-600 rounded-full transition-all duration-100"
                 style={{ width: `${progressPercentage}%` }}
               ></div>
             </div>
@@ -394,7 +392,7 @@ export default function MusicSection() {
             <div className="flex items-center gap-2">
               <button
                 onClick={handleVolumeDown}
-                className="text-slate-400 hover:text-blue-900 transition-colors p-2"
+                className="text-slate-400 hover:text-red-900 transition-colors p-2"
                 aria-label="Diminuir volume"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -408,7 +406,7 @@ export default function MusicSection() {
                   max="100"
                   value={volume}
                   onChange={(e) => handleVolumeChange(parseInt(e.target.value))}
-                  className="w-16 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-900"
+                  className="w-16 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-red-900"
                   aria-label="Volume"
                 />
                 <span className="text-xs text-slate-500 font-medium w-8 text-center">
@@ -417,7 +415,7 @@ export default function MusicSection() {
               </div>
               <button
                 onClick={handleVolumeUp}
-                className="text-slate-400 hover:text-blue-900 transition-colors p-2"
+                className="text-slate-400 hover:text-red-900 transition-colors p-2"
                 aria-label="Aumentar volume"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -429,7 +427,7 @@ export default function MusicSection() {
             
             {/* Controles de Play/Pause */}
             <div className="flex items-center gap-6">
-              <button className="text-slate-500 hover:text-blue-900 transition-colors p-1" aria-label="Música anterior">
+              <button className="text-slate-500 hover:text-red-900 transition-colors p-1" aria-label="Música anterior">
                 <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z" />
                 </svg>
@@ -437,7 +435,7 @@ export default function MusicSection() {
               
               <button
                 onClick={handleTogglePlay}
-                className="flex items-center justify-center size-14 bg-blue-900 text-white rounded-full shadow-lg shadow-blue-900/30 hover:scale-105 active:scale-95 transition-all"
+                className="flex items-center justify-center size-14 bg-red-900 text-white rounded-full shadow-lg shadow-red-900/30 hover:scale-105 active:scale-95 transition-all"
                 aria-label={isPlaying ? 'Pausar música' : 'Tocar música'}
               >
                 {isPlaying ? (
@@ -451,7 +449,7 @@ export default function MusicSection() {
                 )}
               </button>
               
-              <button className="text-slate-500 hover:text-blue-900 transition-colors p-1" aria-label="Próxima música">
+              <button className="text-slate-500 hover:text-red-900 transition-colors p-1" aria-label="Próxima música">
                 <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0011 6v2.798l-5.445-3.63z" />
                 </svg>
